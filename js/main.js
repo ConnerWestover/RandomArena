@@ -24,6 +24,8 @@ app.main = {
 	roundScore: 0,
 	totalScore: 0,
 	sound: undefined,
+	enemies: [],
+	numEnemies: 5,
 	
 	PLAYER: {
 		health: 10,
@@ -31,7 +33,17 @@ app.main = {
 		attackPower: 5,
 		defense: 1,
 		x: 420,
-		y: 420
+		y: 420,
+		radius: 20
+	},
+	
+	ENEMY: {
+		health: 2,
+		attackPower: 1,
+		defense: 1,
+		x: 0,
+		y: 0,
+		radius: 15
 	},
 	
 	// Part I - #2
@@ -105,7 +117,9 @@ app.main = {
 		
 		this.gameState = this.GAME_STATE.MAIN_MENU;
 		this.canvas.onmousedown = this.doMousedown.bind(this);
-				
+		
+		this.enemies = this.makeEnemy(this.numEnemies);
+			
 		this.reset();
 		
 		this.update();
@@ -128,9 +142,9 @@ app.main = {
 	 	var dt = this.calculateDeltaTime();
 	 	 
 	 	// 4) UPDATE
-		
+		this.moveEnemy(dt);
 		this.checkForCollisions();
-		console.log(this.gameState);
+		
 		// 5) DRAW	
 		// i) draw background
 		this.ctx.fillStyle = "black"; 
@@ -140,6 +154,13 @@ app.main = {
 		
 		//GamePlay Drawing Happens
 		if (this.gameState == this.GAME_STATE.DEFAULT){
+			this.drawPlayer(this.ctx);
+			this.ctx.globalAlpha = 1.0;
+			this.drawHUD(this.ctx);
+			this.drawEnemy(this.ctx);
+		}
+		
+		if(this.gameState == this.GAME_STATE.ROUND_OVER){
 			this.drawPlayer(this.ctx);
 			this.ctx.globalAlpha = 1.0;
 			this.drawHUD(this.ctx);
@@ -205,11 +226,86 @@ app.main = {
 		ctx.fillStyle = "red";
 		ctx.strokeStyle = "black";
 		ctx.beginPath();
-		ctx.arc(this.PLAYER.x, this.PLAYER.y, 30, 0,Math.PI*2, false);
+		ctx.arc(this.PLAYER.x, this.PLAYER.y, this.PLAYER.radius, 0, Math.PI*2, false);
 		ctx.fill();
 		ctx.closePath();
 		ctx.stroke();
 		ctx.restore();
+	},
+	
+	makeEnemy: function(num){
+		var enemyDraw = function(ctx){
+			ctx.save();
+			ctx.fillStyle = "green";
+			ctx.beginPath();
+			ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
+			ctx.fill();
+			ctx.closePath();
+			ctx.restore();
+		};
+		
+		var enemyMove = function(dt){
+			this.xSpeed = app.main.PLAYER.x - this.x;
+			this.ySpeed = app.main.PLAYER.y - this.y;
+			
+			var mag = Math.sqrt(this.xSpeed*this.xSpeed + this.ySpeed*this.ySpeed);
+			this.xSpeed /= mag;
+			this.ySpeed /= mag;
+			
+			this.x += this.xSpeed * this.speed * dt;
+			this.y += this.ySpeed * this.speed * dt;
+		}
+		
+		var array = [];
+		
+		for(var i = 0; i < num; i++){
+			var e = {};
+			var door = Math.floor(getRandom(0, 2));
+			//control spawn point
+			if(door == 0){
+				e.x = 30;
+				e.y = this.HEIGHT/2;
+			}
+			else if(door == 1){
+				e.x = this.WIDTH/2;
+				e.y = 30;
+			}
+			else{
+				e.x = this.WIDTH - 30;
+				e.y = this.HEIGHT/2;
+			}
+			
+			e.xSpeed = this.PLAYER.x - e.x;
+			e.ySpeed = this.PLAYER.y - e.y;
+			var mag = Math.sqrt(e.xSpeed*e.xSpeed + e.ySpeed*e.ySpeed);
+			e.xSpeed /= mag;
+			e.ySpeed /= mag;
+			
+			e.speed = 30;
+			
+			e.radius = this.ENEMY.radius;
+			
+			e.draw = enemyDraw;
+			e.move = enemyMove;
+			
+			Object.seal(e);
+			array.push(e);
+		}
+		return array;
+	},
+	
+	drawEnemy: function(ctx){
+		for(var i = 0; i < this.enemies.length; i++){
+			var e = this.enemies[i];
+			e.draw(ctx);
+		}
+	},
+	
+	moveEnemy: function(dt){
+		for(var i = 0; i < this.enemies.length; i++){
+			var e = this.enemies[i];
+			e.move(dt);
+		}
 	},
 	
 	fillText: function(ctx, string, x, y, css, color) {
