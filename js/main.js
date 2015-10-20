@@ -12,8 +12,8 @@ var app = app || {};
 
 app.main = {
 	//  properties
-    WIDTH : 840, 
-    HEIGHT: 840,
+    WIDTH : 920, 
+    HEIGHT: 640,
     canvas: undefined,
     ctx: undefined,
    	lastTime: 0, // used by calculateDeltaTime() 
@@ -34,7 +34,17 @@ app.main = {
 		defense: 1,
 		x: 420,
 		y: 420,
-		radius: 20
+		radius: 0,
+		maxBullets: 50000,
+		BULLET:{
+			distance: 600,
+			power: 1,
+			x: 0,
+			y: 0,
+			radius: 2,
+			speed: 0,
+			live: false
+		},
 	},
 	
 	ENEMY: {
@@ -117,9 +127,10 @@ app.main = {
 		
 		this.gameState = this.GAME_STATE.MAIN_MENU;
 		this.canvas.onmousedown = this.doMousedown.bind(this);
-		
+		this.PLAYER = this.makePlayer();
+		console.log(this.gameState, this.PLAYER);
 		this.enemies = this.makeEnemy(this.numEnemies);
-		this.delayEnemy();
+		//this.delayEnemy();
 			
 		this.reset();
 		
@@ -152,25 +163,44 @@ app.main = {
 		this.ctx.fillRect(0,0,this.WIDTH,this.HEIGHT); 
 		
 		this.drawMain(this.ctx);
-		
+
 		//GamePlay Drawing Happens
 		if (this.gameState == this.GAME_STATE.DEFAULT){
-			this.drawPlayer(this.ctx);
+			if(myKeys.keydown[myKeys.KEYBOARD.KEY_W]){
+				this.PLAYER.moveY(-dt);
+			}	
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_S]){
+				this.PLAYER.moveY(dt);
+			} 
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_A]){
+				this.PLAYER.moveX(-dt);
+			} 
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_D]){
+				this.PLAYER.moveX(dt);
+			} 
+			if(myKeys.keydown[myKeys.KEYBOARD.KEY_UP]){
+				this.PLAYER.fireUp();
+			}	
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_DOWN]){
+				this.PLAYER.fireDown();
+			} 
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_LEFT]){
+				this.PLAYER.fireLeft();
+			} 
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT]){
+				this.PLAYER.fireRight();
+			}
+			this.PLAYER.update(dt);
+			this.PLAYER.draw(this.ctx);
 			this.ctx.globalAlpha = 1.0;
 			this.drawHUD(this.ctx);
 			this.drawEnemy(this.ctx);
 		}
 		
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
-			this.drawPlayer(this.ctx);
+			this.PLAYER.draw(this.ctx);
 			this.ctx.globalAlpha = 1.0;
 			this.drawHUD(this.ctx);
-		}
-				
-		// iv) draw debug info
-		if (this.debug){
-			// draw dt in bottom right corner
-			this.fillText(this.ctx,"dt: " + dt.toFixed(3), this.WIDTH - 150, this.HEIGHT - 10, "18pt courier", "white");
 		}
 		
 	},
@@ -222,16 +252,123 @@ app.main = {
 		ctx.restore(); // NEW
 	},
 	
-	drawPlayer: function(ctx){
-		ctx.save();
-		ctx.fillStyle = "red";
-		ctx.strokeStyle = "black";
-		ctx.beginPath();
-		ctx.arc(this.PLAYER.x, this.PLAYER.y, this.PLAYER.radius, 0, Math.PI*2, false);
-		ctx.fill();
-		ctx.closePath();
-		ctx.stroke();
-		ctx.restore();
+	
+	makePlayer: function(){
+		var makeBullet = function(x,y,xSpeed, ySpeed){
+			var move = function(dt){
+				this.x += this.xSpeed;
+				this.y += this.ySpeed;
+				this.traveled += Math.abs(this.ySpeed);
+				this.traveled += Math.abs(this.xSpeed);
+				
+				if (this.maxDistance < this.traveled){
+					this.live = false;
+				}
+			};
+			
+			var draw = function(ctx){
+				ctx.save();
+				ctx.fillStyle = "red";
+				ctx.strokeStyle = "black";
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+			};
+			
+			var b = {};
+			b.maxDistance = 600;
+			b.traveled = 0;
+			b.power = 1;
+			b.x = this.x;
+			b.y = this.y;
+			b.radius = 5;
+			b.xSpeed = xSpeed;
+			b.ySpeed = ySpeed;
+			b.live = true
+			b.draw = draw;
+			b.move = move;
+			
+			return b;
+		};
+		
+		var fireU = function(){
+			if (this.bullets.length < p.maxBullets){
+				this.bullets.push(this.makeBullet(this.x,this.y,0,-5));
+			}
+		};
+		var fireD = function(){
+			if (this.bullets.length < p.maxBullets){
+				this.bullets.push(this.makeBullet(this.x,this.y,0,5));
+			}
+		};
+		var fireL = function(){
+			if (this.bullets.length < p.maxBullets){
+				this.bullets.push(this.makeBullet(this.x,this.y,-5,0));
+			}
+		};
+		var fireR = function(){
+			if (this.bullets.length < p.maxBullets){
+				this.bullets.push(this.makeBullet(this.x,this.y,5,0));
+			}
+		};
+		var drawPlayer = function(ctx){
+			ctx.save();
+			ctx.fillStyle = "red";
+			ctx.strokeStyle = "black";
+			ctx.beginPath();
+			ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
+			ctx.fill();
+			ctx.closePath();
+			ctx.stroke();
+			ctx.restore();
+			for (var i = 0; i < this.bullets.length; i++){
+				this.bullets[i].draw(ctx);
+			}
+		};
+		
+		var movePlayerX = function(dt){
+			this.x += this.speed * dt;
+		};
+		
+		var movePlayerY = function(dt){
+			this.y += this.speed * dt;
+		};
+		
+		var update = function(dt){
+			for (var i = 0; i < this.bullets.length; i++){
+				this.bullets[i].move(dt);
+				if(this.bullets[i].live == false) this.bullets.splice(i, 1);
+			}
+			if (this.x - this.radius < 0) this.x = this.radius;
+			if (this.x + this.radius > app.main.WIDTH) this.x = app.main.WIDTH - this.radius;
+			if (this.y - this.radius < 0) this.y = this.radius;
+			if (this.y + this.radius > app.main.HEIGHT) this.y = app.main.HEIGHT - this.radius;
+		}
+		
+		var p = {};
+		p.draw = drawPlayer;
+		p.speed = 200;
+		p.x = this.WIDTH/2;
+		p.y = this.HEIGHT/2;
+		p.moveX = movePlayerX;
+		p.moveY = movePlayerY;
+		p.health = 10;
+		p.weapon = "gun";
+		p.attackPower = 1;
+		p.defense = 1;
+		p.radius = 30;
+		p.maxBullets = 10;
+		p.bullets = [];
+		p.makeBullet = makeBullet;
+		p.fireUp = fireU;
+		p.fireDown = fireD;
+		p.fireLeft = fireL;
+		p.fireRight = fireR;
+		p.update = update;
+		
+		return p;
 	},
 	
 	makeEnemy: function(num){
@@ -302,7 +439,7 @@ app.main = {
 	drawEnemy: function(ctx){
 		for(var i = 0; i < this.enemies.length; i++){
 			var e = this.enemies[i];
-			console.log(e.started);
+			//console.log(e.started);
 			//should function to make them leave at different intervals
 			if(e.started == true){
 				e.draw(ctx);
@@ -320,7 +457,7 @@ app.main = {
 	delayEnemy: function(){
 		for(var i = 0; i < this.enemies.length; i++){
 			var e = this.enemies[i];
-			debugger;
+			//debugger;
 			setTimeout(function(){e.started = true;}, i * 1000);
 		}
 	},
