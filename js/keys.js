@@ -44,6 +44,19 @@ window.addEventListener("keyup",function(e){
 			app.main.pauseGame();
 		}
 	}
+	//debugger;
+	if (e.which == 38){
+		app.main.PLAYER.fireUp();
+	}
+	if (e.which == 37){
+		app.main.PLAYER.fireLeft();
+	}
+	if (e.which == 40){
+		app.main.PLAYER.fireDown();
+	}
+	if (e.which == 39){
+		app.main.PLAYER.fireRight();
+	}
 	
 
 	

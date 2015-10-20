@@ -26,6 +26,7 @@ app.main = {
 	sound: undefined,
 	enemies: [],
 	numEnemies: 5,
+	staggerTime: 0,
 	
 	PLAYER: {
 		health: 10,
@@ -129,8 +130,9 @@ app.main = {
 		this.canvas.onmousedown = this.doMousedown.bind(this);
 		this.PLAYER = this.makePlayer();
 		console.log(this.gameState, this.PLAYER);
+		//debugger;
 		this.enemies = this.makeEnemy(this.numEnemies);
-		//this.delayEnemy();
+		this.delayEnemy();
 			
 		this.reset();
 		
@@ -158,14 +160,12 @@ app.main = {
 		this.checkForCollisions();
 		
 		// 5) DRAW	
-		// i) draw background
-		this.ctx.fillStyle = "black"; 
-		this.ctx.fillRect(0,0,this.WIDTH,this.HEIGHT); 
-		
+		// i) draw background		
 		this.drawMain(this.ctx);
 
 		//GamePlay Drawing Happens
 		if (this.gameState == this.GAME_STATE.DEFAULT){
+			this.drawBackground(this.ctx);
 			if(myKeys.keydown[myKeys.KEYBOARD.KEY_W]){
 				this.PLAYER.moveY(-dt);
 			}	
@@ -178,18 +178,6 @@ app.main = {
 			if (myKeys.keydown[myKeys.KEYBOARD.KEY_D]){
 				this.PLAYER.moveX(dt);
 			} 
-			if(myKeys.keydown[myKeys.KEYBOARD.KEY_UP]){
-				this.PLAYER.fireUp();
-			}	
-			if (myKeys.keydown[myKeys.KEYBOARD.KEY_DOWN]){
-				this.PLAYER.fireDown();
-			} 
-			if (myKeys.keydown[myKeys.KEYBOARD.KEY_LEFT]){
-				this.PLAYER.fireLeft();
-			} 
-			if (myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT]){
-				this.PLAYER.fireRight();
-			}
 			this.PLAYER.update(dt);
 			this.PLAYER.draw(this.ctx);
 			this.ctx.globalAlpha = 1.0;
@@ -205,11 +193,32 @@ app.main = {
 		
 	},
 	
+	drawBackground: function(ctx){
+		ctx.fillStyle = "white"; 
+		ctx.strokeStyle = "black";
+		ctx.fillRect(0,0,this.WIDTH,this.HEIGHT); 
+		for (var i = 0; i < this.WIDTH; i+= this.WIDTH/20){
+			ctx.beginPath();
+			ctx.moveTo(i, 0);
+			ctx.lineTo(i, this.HEIGHT);
+			ctx.closePath();
+			ctx.stroke();
+		}
+		
+		for (var i = 0; i < this.HEIGHT; i+= this.HEIGHT/20){
+			ctx.beginPath();
+			ctx.moveTo(0, i);
+			ctx.lineTo(this.WIDTH, i);
+			ctx.closePath();
+			ctx.stroke();
+		}
+	},
+	
 	drawMain: function(ctx){
 		if (this.gameState == this.GAME_STATE.MAIN_MENU){
 			ctx.save();
 			
-			ctx.strokeStyle = "white";
+			ctx.strokeStyle = "black";
 			ctx.lineWidth = 4;
 			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8, this.WIDTH*3/4, this.HEIGHT/6);
 			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8 + this.HEIGHT/6 + 15, this.WIDTH*3/4, this.HEIGHT/6);
@@ -219,10 +228,10 @@ app.main = {
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			
-			this.fillText(ctx, "Play", this.WIDTH/2, this.HEIGHT/8+ this.HEIGHT/11, "30pt courier", "white");
-			this.fillText(ctx, "Instructions", this.WIDTH/2, this.HEIGHT/6 + this.HEIGHT/4 - 10, "30pt courier", "white");
-			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT*2/6 + this.HEIGHT/4 + 5, "30pt courier", "white");
-			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT*3/6 + this.HEIGHT/4+ 20, "30pt courier", "white");
+			this.fillText(ctx, "Play", this.WIDTH/2, this.HEIGHT/8+ this.HEIGHT/11, "30pt courier", "black");
+			this.fillText(ctx, "Instructions", this.WIDTH/2, this.HEIGHT/6 + this.HEIGHT/4 - 10, "30pt courier", "black");
+			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT*2/6 + this.HEIGHT/4 + 5, "30pt courier", "black");
+			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT*3/6 + this.HEIGHT/4+ 20, "30pt courier", "black");
 			ctx.restore();
 		}
 	},
@@ -315,6 +324,16 @@ app.main = {
 		};
 		var drawPlayer = function(ctx){
 			ctx.save();
+			ctx.fillStyle = "black";
+			ctx.strokeStyle = "black";
+			ctx.globalAlpha = .7;
+			ctx.beginPath();
+			ctx.arc(this.x, this.y+20, this.radius*.9, 0, Math.PI*2, false);
+			ctx.fill();
+			ctx.closePath();
+			ctx.stroke();
+			ctx.restore();
+			ctx.save();
 			ctx.fillStyle = "red";
 			ctx.strokeStyle = "black";
 			ctx.beginPath();
@@ -395,7 +414,6 @@ app.main = {
 		}
 		
 		var array = [];
-		
 		for(var i = 0; i < num; i++){
 			var e = {};
 			var door = Math.floor(getRandom(0, 2));
@@ -423,14 +441,19 @@ app.main = {
 			e.xSpeed /= mag;
 			e.ySpeed /= mag;
 			
+			
+			e.timeDelay = i*1000;
+			
 			e.speed = 30;
 			
+			e.health = 10;
+			e.attackPower = 1;
 			e.radius = this.ENEMY.radius;
 			
 			e.draw = enemyDraw;
 			e.move = enemyMove;
 			
-			Object.seal(e);
+			//Object.seal(e);
 			array.push(e);
 		}
 		return array;
@@ -457,8 +480,7 @@ app.main = {
 	delayEnemy: function(){
 		for(var i = 0; i < this.enemies.length; i++){
 			var e = this.enemies[i];
-			//debugger;
-			setTimeout(function(){e.started = true;}, i * 1000);
+			setTimeout(function(){e.started = true;}, e.timeDelay);
 		}
 	},
 	
@@ -485,7 +507,20 @@ app.main = {
 	
 	
 	checkForCollisions: function(){
-		
+		for (var j = 0; j < this.enemies.length; j++){
+			if (this.PLAYER.x - this.enemies[j].x < this.PLAYER.radius + this.enemies[j].radius &&
+				this.PLAYER.y - this.enemies[j].y < this.PLAYER.radius + this.enemies[j].radius){
+					this.PLAYER.health -= this.enemies[j].attackPower;
+				}
+			for (var i = 0; i < this.PLAYER.bullets.length; i++){
+				var e = this.enemies[j];
+				var b = this.PLAYER.bullets[i];
+				if (Math.abs(b.x - e.x) < b.radius + e.radius && Math.abs(b.y - e.y) < b.radius + e.radius){
+					e.health -= b.power;
+					b.live = false;
+				}
+			}
+		}
 	},
 	
 	drawPauseScreen: function(ctx){
