@@ -119,6 +119,7 @@ app.main = {
 		this.canvas.onmousedown = this.doMousedown.bind(this);
 		
 		this.enemies = this.makeEnemy(this.numEnemies);
+		this.delayEnemy();
 			
 		this.reset();
 		
@@ -275,8 +276,12 @@ app.main = {
 				e.y = this.HEIGHT/2;
 			}
 			
+			e.started = false;
+			
+			//calculate direction to player
 			e.xSpeed = this.PLAYER.x - e.x;
 			e.ySpeed = this.PLAYER.y - e.y;
+			//normalize
 			var mag = Math.sqrt(e.xSpeed*e.xSpeed + e.ySpeed*e.ySpeed);
 			e.xSpeed /= mag;
 			e.ySpeed /= mag;
@@ -297,7 +302,11 @@ app.main = {
 	drawEnemy: function(ctx){
 		for(var i = 0; i < this.enemies.length; i++){
 			var e = this.enemies[i];
-			e.draw(ctx);
+			console.log(e.started);
+			//should function to make them leave at different intervals
+			if(e.started == true){
+				e.draw(ctx);
+			}
 		}
 	},
 	
@@ -305,6 +314,14 @@ app.main = {
 		for(var i = 0; i < this.enemies.length; i++){
 			var e = this.enemies[i];
 			e.move(dt);
+		}
+	},
+	
+	delayEnemy: function(){
+		for(var i = 0; i < this.enemies.length; i++){
+			var e = this.enemies[i];
+			debugger;
+			setTimeout(function(){e.started = true;}, i * 1000);
 		}
 	},
 	
