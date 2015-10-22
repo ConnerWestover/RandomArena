@@ -25,7 +25,7 @@ app.main = {
 	totalScore: 0,
 	sound: undefined,
 	enemies: [],
-	numEnemies: 100,
+	numEnemies: 20,
 	staggerTime: 0,
 	
 	PLAYER: {
@@ -131,7 +131,6 @@ app.main = {
 		this.PLAYER = this.makePlayer();
 		//debugger;
 		this.enemies = this.makeEnemy(this.numEnemies);
-		this.delayEnemy();
 			
 		this.reset();
 		
@@ -465,9 +464,13 @@ app.main = {
 		}
 		
 		var array = [];
+		
+		var d = new Date();
+		var n = d.getTime();
+		
 		for(var i = 0; i < num; i++){
 			var e = {};
-			var door = Math.floor(getRandom(0, 2));
+			var door = Math.floor(getRandom(0, 3));
 			//control spawn point
 			if(door == 0){
 				e.x = 30;
@@ -482,6 +485,8 @@ app.main = {
 				e.y = this.HEIGHT/2;
 			}
 			
+			e.startTime = n;
+			
 			e.started = false;
 			
 			//calculate direction to player
@@ -491,9 +496,6 @@ app.main = {
 			var mag = Math.sqrt(e.xSpeed*e.xSpeed + e.ySpeed*e.ySpeed);
 			e.xSpeed /= mag;
 			e.ySpeed /= mag;
-			
-			
-			e.timeDelay = i*1000;
 			
 			e.speed = 30;
 			
@@ -524,8 +526,18 @@ app.main = {
 	drawEnemy: function(ctx){
 		for(var i = 0; i < this.enemies.length; i++){
 			var e = this.enemies[i];
-			//console.log(e.started);
-			//should function to make them leave at different intervals
+			
+			var d = new Date();
+			var n = d.getTime();
+			
+			if((e.startTime + i*1000) <= n){
+				e.started = true;
+			}
+			
+			if(e.started == true){
+				console.log(i);
+			}
+			
 			if(e.started == true){
 				e.draw(ctx);
 			}
@@ -535,14 +547,9 @@ app.main = {
 	moveEnemy: function(dt){
 		for(var i = 0; i < this.enemies.length; i++){
 			var e = this.enemies[i];
-			e.move(dt);
-		}
-	},
-	
-	delayEnemy: function(){
-		for(var i = 0; i < this.enemies.length; i++){
-			var e = this.enemies[i];
-			setTimeout(function(){e.started = true;}, e.timeDelay);
+			if(e.started == true){
+				e.move(dt);
+			}
 		}
 	},
 	
