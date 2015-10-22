@@ -25,7 +25,7 @@ app.main = {
 	totalScore: 0,
 	sound: undefined,
 	enemies: [],
-	numEnemies: 5,
+	numEnemies: 100,
 	staggerTime: 0,
 	
 	PLAYER: {
@@ -129,7 +129,6 @@ app.main = {
 		this.gameState = this.GAME_STATE.MAIN_MENU;
 		this.canvas.onmousedown = this.doMousedown.bind(this);
 		this.PLAYER = this.makePlayer();
-		console.log(this.gameState, this.PLAYER);
 		//debugger;
 		this.enemies = this.makeEnemy(this.numEnemies);
 		this.delayEnemy();
@@ -165,6 +164,7 @@ app.main = {
 
 		//GamePlay Drawing Happens
 		if (this.gameState == this.GAME_STATE.DEFAULT){
+			//update everyone
 			this.drawBackground(this.ctx);
 			if(myKeys.keydown[myKeys.KEYBOARD.KEY_W]){
 				this.PLAYER.moveY(-dt);
@@ -179,15 +179,17 @@ app.main = {
 				this.PLAYER.moveX(dt);
 			} 
 			this.PLAYER.update(dt);
+			// draw shadows
+			this.drawShadows(this.ctx);
+			//draw things
 			this.PLAYER.draw(this.ctx);
-			this.ctx.globalAlpha = 1.0;
-			this.drawHUD(this.ctx);
 			this.drawEnemy(this.ctx);
+			//draw hud
+			this.drawHUD(this.ctx);
 		}
 		
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
 			this.PLAYER.draw(this.ctx);
-			this.ctx.globalAlpha = 1.0;
 			this.drawHUD(this.ctx);
 		}
 		
@@ -237,19 +239,27 @@ app.main = {
 	},
 	
 	drawHUD: function(ctx){
-		ctx.save(); // NEW
+		ctx.save();
 		// draw score
       	// fillText(this.ctx,string, x, y, css, color)
-		this.fillText(this.ctx,"Total Score: " + this.totalScore, this.WIDTH - 200, 20, "14pt courier", "#ddd");
-
-		// NEW
+		ctx.fillStyle = "white";
+		ctx.fillRect(this.WIDTH - 210, 2.5, 170, 22.5);
+		this.fillText(this.ctx,"Total Score: " + this.totalScore, this.WIDTH - 200, 20, "14pt courier", "black");
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "black";
+		ctx.fillRect(5,5, 200, 40);
+		ctx.fillStyle = "red";
+		ctx.fillRect(5,5,200 * (this.PLAYER.health/this.PLAYER.maxHealth),40);
+		ctx.strokeRect(5,5, 200, 40);
+		
+		
+		ctx.fillStyle = "white";
 		if(this.gameState == this.GAME_STATE.BEGIN){
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			this.fillText(this.ctx,"To begin, click the screen", this.WIDTH/2, this.HEIGHT/2, "30pt courier", "white");
 		} // end if
 	
-		// NEW
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
 			ctx.save();
 			ctx.textAlign = "center";
@@ -286,6 +296,17 @@ app.main = {
 				ctx.stroke();
 			};
 			
+			var drawShadow = function(ctx){
+				ctx.save();
+				ctx.fillStyle = "black";
+				ctx.beginPath();
+				ctx.globalAlpha = 0.5;
+				ctx.arc(this.x, this.y + 20 - (20 * (this.traveled/this.maxDistance)), this.radius *.9, 0, Math.PI*2, false);
+				ctx.closePath();
+				ctx.fill();
+				ctx.restore();
+			}
+			
 			var b = {};
 			b.maxDistance = 600;
 			b.traveled = 0;
@@ -297,6 +318,7 @@ app.main = {
 			b.ySpeed = ySpeed;
 			b.live = true
 			b.draw = draw;
+			b.drawShadow = drawShadow;
 			b.move = move;
 			
 			return b;
@@ -324,16 +346,6 @@ app.main = {
 		};
 		var drawPlayer = function(ctx){
 			ctx.save();
-			ctx.fillStyle = "black";
-			ctx.strokeStyle = "black";
-			ctx.globalAlpha = .7;
-			ctx.beginPath();
-			ctx.arc(this.x, this.y+20, this.radius*.9, 0, Math.PI*2, false);
-			ctx.fill();
-			ctx.closePath();
-			ctx.stroke();
-			ctx.restore();
-			ctx.save();
 			ctx.fillStyle = "red";
 			ctx.strokeStyle = "black";
 			ctx.beginPath();
@@ -346,6 +358,22 @@ app.main = {
 				this.bullets[i].draw(ctx);
 			}
 		};
+		
+		var drawShadow = function(ctx){
+			ctx.save();
+			ctx.fillStyle = "black";
+			ctx.strokeStyle = "black";
+			ctx.globalAlpha = .7;
+			ctx.beginPath();
+			ctx.arc(this.x, this.y+20, this.radius*.9, 0, Math.PI*2, false);
+			ctx.fill();
+			ctx.closePath();
+			ctx.stroke();
+			ctx.restore();
+			for (var i = 0; i < this.bullets.length; i++){
+				this.bullets[i].drawShadow(ctx);
+			}
+		}
 		
 		var movePlayerX = function(dt){
 			this.x += this.speed * dt;
@@ -364,6 +392,14 @@ app.main = {
 			if (this.x + this.radius > app.main.WIDTH) this.x = app.main.WIDTH - this.radius;
 			if (this.y - this.radius < 0) this.y = this.radius;
 			if (this.y + this.radius > app.main.HEIGHT) this.y = app.main.HEIGHT - this.radius;
+			
+			if (this.gotHit){
+				var d = new Date();
+				if (d.getTime() - this.timeGotHit > 1000){
+					this.gotHit = false;
+				}
+			}
+			
 		}
 		
 		var p = {};
@@ -374,6 +410,7 @@ app.main = {
 		p.moveX = movePlayerX;
 		p.moveY = movePlayerY;
 		p.health = 10;
+		p.maxHealth = 10;
 		p.weapon = "gun";
 		p.attackPower = 1;
 		p.defense = 1;
@@ -386,6 +423,9 @@ app.main = {
 		p.fireLeft = fireL;
 		p.fireRight = fireR;
 		p.update = update;
+		p.drawShadow = drawShadow;
+		p.gotHit = false;
+		p.timeGotHit = 0;
 		
 		return p;
 	},
@@ -396,6 +436,17 @@ app.main = {
 			ctx.fillStyle = "green";
 			ctx.beginPath();
 			ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
+			ctx.fill();
+			ctx.closePath();
+			ctx.restore();
+		};
+		
+		var enemyDrawShadow = function(ctx){
+			ctx.save();
+			ctx.fillStyle = "black";
+			ctx.beginPath();
+			ctx.globalAlpha = .7;
+			ctx.arc(this.x, this.y + 20, this.radius*.9, 0, Math.PI*2, false);
 			ctx.fill();
 			ctx.closePath();
 			ctx.restore();
@@ -451,12 +502,23 @@ app.main = {
 			e.radius = this.ENEMY.radius;
 			
 			e.draw = enemyDraw;
+			e.drawShadow = enemyDrawShadow;
 			e.move = enemyMove;
 			
 			//Object.seal(e);
 			array.push(e);
 		}
 		return array;
+	},
+	
+	drawShadows: function(ctx){
+		this.PLAYER.drawShadow(ctx);
+		for(var i = 0; i < this.enemies.length; i++){
+			var e = this.enemies[i];
+			if(e.started == true){
+				e.drawShadow(ctx);
+			}
+		}
 	},
 	
 	drawEnemy: function(ctx){
@@ -508,9 +570,12 @@ app.main = {
 	
 	checkForCollisions: function(){
 		for (var j = 0; j < this.enemies.length; j++){
-			if (this.PLAYER.x - this.enemies[j].x < this.PLAYER.radius + this.enemies[j].radius &&
+			if (!this.PLAYER.gotHit && this.PLAYER.x - this.enemies[j].x < this.PLAYER.radius + this.enemies[j].radius &&
 				this.PLAYER.y - this.enemies[j].y < this.PLAYER.radius + this.enemies[j].radius){
 					this.PLAYER.health -= this.enemies[j].attackPower;
+					var d = new Date();
+					this.PLAYER.timeGotHit = d.getTime();
+					this.PLAYER.gotHit = true;
 				}
 			for (var i = 0; i < this.PLAYER.bullets.length; i++){
 				var e = this.enemies[j];
