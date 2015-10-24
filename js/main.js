@@ -139,6 +139,8 @@ app.main = {
 	
 	reset: function(){
 		this.roundScore = 0;
+		this.enemies = this.makeEnemy(this.numEnemies);
+		this.PLAYER = this.makePlayer();
 	},
 	
 	update: function(){
@@ -158,8 +160,10 @@ app.main = {
 		this.checkForCollisions();
 		
 		// 5) DRAW	
-		// i) draw background		
-		this.drawMain(this.ctx);
+		// i) draw background	
+		if(this.gameState == this.GAME_STATE.MAIN_MENU){
+			this.drawMain(this.ctx);
+		}
 
 		//GamePlay Drawing Happens
 		if (this.gameState == this.GAME_STATE.DEFAULT){
@@ -185,10 +189,11 @@ app.main = {
 			this.drawEnemy(this.ctx);
 			//draw hud
 			this.drawHUD(this.ctx);
+			
+			this.checkEnemiesDead();
 		}
 		
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
-			this.PLAYER.draw(this.ctx);
 			this.drawHUD(this.ctx);
 		}
 		
@@ -488,6 +493,7 @@ app.main = {
 			e.startTime = n;
 			
 			e.started = false;
+			e.alive = true;
 			
 			//calculate direction to player
 			e.xSpeed = this.PLAYER.x - e.x;
@@ -497,9 +503,9 @@ app.main = {
 			e.xSpeed /= mag;
 			e.ySpeed /= mag;
 			
-			e.speed = 30;
+			e.speed = Math.floor(getRandom(30, 80));
 			
-			e.health = 10;
+			e.health = 2;
 			e.attackPower = 1;
 			e.radius = this.ENEMY.radius;
 			
@@ -517,7 +523,7 @@ app.main = {
 		this.PLAYER.drawShadow(ctx);
 		for(var i = 0; i < this.enemies.length; i++){
 			var e = this.enemies[i];
-			if(e.started == true){
+			if(e.started == true && e.alive == true){
 				e.drawShadow(ctx);
 			}
 		}
@@ -538,7 +544,7 @@ app.main = {
 				console.log(i);
 			}
 			
-			if(e.started == true){
+			if(e.started == true && e.alive == true){
 				e.draw(ctx);
 			}
 		}
@@ -575,11 +581,19 @@ app.main = {
 	},
 	
 	
+	//check collision 
 	checkForCollisions: function(){
 		for (var j = 0; j < this.enemies.length; j++){
-			if (!this.PLAYER.gotHit && this.PLAYER.x - this.enemies[j].x < this.PLAYER.radius + this.enemies[j].radius &&
-				this.PLAYER.y - this.enemies[j].y < this.PLAYER.radius + this.enemies[j].radius){
-					this.PLAYER.health -= this.enemies[j].attackPower;
+			if (this.enemies[j].alive == false) continue; // if enemy isn't alive disregard
+			if (this.enemies[j].started == false) continue; // if enemy isn't started disregard
+			if (!this.PLAYER.gotHit && 
+				Math.abs(this.PLAYER.x - this.enemies[j].x) < this.PLAYER.radius + this.enemies[j].radius &&
+				Math.abs(this.PLAYER.y - this.enemies[j].y) < this.PLAYER.radius + this.enemies[j].radius){
+					this.PLAYER.health -= this.enemies[j].attackPower; //decrement health
+						if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
+							this.PLAYER.health = 0;
+							this.gameState = this.GAME_STATE.ROUND_OVER;
+						}
 					var d = new Date();
 					this.PLAYER.timeGotHit = d.getTime();
 					this.PLAYER.gotHit = true;
@@ -590,8 +604,22 @@ app.main = {
 				if (Math.abs(b.x - e.x) < b.radius + e.radius && Math.abs(b.y - e.y) < b.radius + e.radius){
 					e.health -= b.power;
 					b.live = false;
+					if(e.health <= 0){
+						e.alive = false;
+					}
 				}
 			}
+		}
+	},
+	
+	//check if all enemies have been killed
+	checkEnemiesDead: function(){
+		var dead = 0;
+		for (var j = 0; j < this.enemies.length; j++){
+			if(this.enemies[j].alive == false) dead++;
+		}
+		if(dead == 20){
+			this.gameState = this.GAME_STATE.ROUND_OVER;
 		}
 	},
 	
