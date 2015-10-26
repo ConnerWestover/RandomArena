@@ -29,6 +29,7 @@ myKeys.keydown = [];
 window.addEventListener("keydown",function(e){
 	//console.log("keydown=" + e.keyCode);
 	myKeys.keydown[e.keyCode] = true;
+
 });
 	
 window.addEventListener("keyup",function(e){
@@ -45,19 +46,6 @@ window.addEventListener("keyup",function(e){
 		}
 	}
 	//debugger;
-	if (e.which == 38){
-		app.main.PLAYER.fireUp();
-	}
-	if (e.which == 37){
-		app.main.PLAYER.fireLeft();
-	}
-	if (e.which == 40){
-		app.main.PLAYER.fireDown();
-	}
-	if (e.which == 39){
-		app.main.PLAYER.fireRight();
-	}
-	
 
 	
 });

@@ -113,6 +113,12 @@ app.main = {
 				this.gameState = this.GAME_STATE.ABOUT;
 				
 			}
+		} else if (this.gameState == this.GAME_STATE.INSTRUCTIONS ||
+					this.gameState == this.GAME_STATE.OPTIONS ||
+					this.gameState == this.GAME_STATE.ABOUT){
+			if (mouse.x < 130 && mouse.y < 60){
+				this.gameState = this.GAME_STATE.MAIN_MENU;
+			}
 		}
 		
 	},
@@ -125,7 +131,7 @@ app.main = {
 		this.canvas.width = this.WIDTH;
 		this.canvas.height = this.HEIGHT;
 		this.ctx = this.canvas.getContext('2d');
-		
+		this.totalScore = 0;
 		this.gameState = this.GAME_STATE.MAIN_MENU;
 		this.canvas.onmousedown = this.doMousedown.bind(this);
 		this.PLAYER = this.makePlayer();
@@ -146,6 +152,8 @@ app.main = {
 	update: function(){
 	 	this.animationID = requestAnimationFrame(this.update.bind(this));
 		
+		this.ctx.clearRect(0,0,this.WIDTH, this.HEIGHT);
+		
 	 	// 2) PAUSED?
 	 	// if so, bail out of loop
 	 	if (this.paused){
@@ -159,16 +167,16 @@ app.main = {
 		this.moveEnemy(dt);
 		this.checkForCollisions();
 		
-		// 5) DRAW	
 		// i) draw background	
-		if(this.gameState == this.GAME_STATE.MAIN_MENU){
-			this.drawMain(this.ctx);
+		if (this.gameState == this.GAME_STATE.DEFAULT){
+			this.drawBackground(this.ctx);
 		}
+		
+		this.drawMain(this.ctx);
 
 		//GamePlay Drawing Happens
 		if (this.gameState == this.GAME_STATE.DEFAULT){
 			//update everyone
-			this.drawBackground(this.ctx);
 			if(myKeys.keydown[myKeys.KEYBOARD.KEY_W]){
 				this.PLAYER.moveY(-dt);
 			}	
@@ -180,6 +188,19 @@ app.main = {
 			} 
 			if (myKeys.keydown[myKeys.KEYBOARD.KEY_D]){
 				this.PLAYER.moveX(dt);
+			} 
+			
+			if(myKeys.keydown[myKeys.KEYBOARD.KEY_UP]){
+				this.PLAYER.fireUp();
+			}	
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_DOWN]){
+				this.PLAYER.fireDown();
+			} 
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_LEFT]){
+				this.PLAYER.fireLeft();
+			} 
+			if (myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT]){
+				this.PLAYER.fireRight();
 			} 
 			this.PLAYER.update(dt);
 			// draw shadows
@@ -239,7 +260,54 @@ app.main = {
 			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT*2/6 + this.HEIGHT/4 + 5, "30pt courier", "black");
 			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT*3/6 + this.HEIGHT/4+ 20, "30pt courier", "black");
 			ctx.restore();
+		} else if (this.gameState == this.GAME_STATE.INSTRUCTIONS){
+			ctx.save();
+			ctx.strokeStyle = "black";
+			ctx.fillStyle = "black";
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.lineWidth = 4;
+			this.fillText(ctx, "Instructions", this.WIDTH/2, this.HEIGHT/8, "60pt courier", "black");
+			this.fillText(ctx, "WASD to move the player", this.WIDTH/2, this.HEIGHT*2/5, "30pt courier", "black");
+			this.fillText(ctx, "Arrow Keys to fire bullets", this.WIDTH/2, this.HEIGHT*2/5 - 40, "30pt courier", "black");
+			this.fillText(ctx, "Defeat anyone who enters the arena", this.WIDTH/2, this.HEIGHT*2/5 + 70, "30pt courier", "black");
+			this.fillText(ctx, "Gain points by defeating enemies", this.WIDTH/2, this.HEIGHT*2/5 + 110, "30pt courier", "black");
+			this.fillText(ctx, "Pickup weapons by walking over them", this.WIDTH/2, this.HEIGHT*2/5 + 200, "30pt courier", "black");
+			this.fillText(ctx, "Fight until you drop", this.WIDTH/2, this.HEIGHT*2/5 + 240, "30pt courier", "black");
+			
+			this.fillText(ctx, "Back", 60, 30, "30pt courier", "black");
+			ctx.strokeRect(0,0,130,60);
+			
+			ctx.restore();
+		} else if (this.gameState == this.GAME_STATE.OPTIONS){
+			ctx.save();
+			ctx.strokeStyle = "black";
+			ctx.fillStyle = "black";
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.lineWidth = 4;
+			this.fillText(ctx, "Back", 60, 30, "30pt courier", "black");
+			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT/8, "60pt courier", "black");
+			this.fillText(ctx, "This section is currently", this.WIDTH/2, this.HEIGHT*2/5, "30pt courier", "black");
+			this.fillText(ctx, "under construction", this.WIDTH/2, this.HEIGHT*2/5+40, "30pt courier", "black");
+			ctx.strokeRect(0,0,130,60);
+			ctx.restore();
+		} else if (this.gameState == this.GAME_STATE.ABOUT){
+			ctx.save();
+			ctx.strokeStyle = "black";
+			ctx.fillStyle = "black";
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.lineWidth = 4;
+			this.fillText(ctx, "Back", 60, 30, "30pt courier", "black");
+			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT/8, "60pt courier", "black");
+			this.fillText(ctx, "Random Arena was created by:", this.WIDTH/2, this.HEIGHT*2/5, "30pt courier", "black");
+			this.fillText(ctx, "Alexander Huffman", this.WIDTH/2, this.HEIGHT*2/5+40, "30pt courier", "black");
+			this.fillText(ctx, "Conner Westover", this.WIDTH/2, this.HEIGHT*2/5+80, "30pt courier", "black");
+			ctx.strokeRect(0,0,130,60);
+			ctx.restore();
 		}
+		
 	},
 	
 	drawHUD: function(ctx){
@@ -329,23 +397,31 @@ app.main = {
 		};
 		
 		var fireU = function(){
-			if (this.bullets.length < p.maxBullets){
+			var d = new Date();
+			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
 				this.bullets.push(this.makeBullet(this.x,this.y,0,-5));
+				this.timeLastFired = d.getTime();
 			}
 		};
 		var fireD = function(){
-			if (this.bullets.length < p.maxBullets){
+			var d = new Date();
+			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
 				this.bullets.push(this.makeBullet(this.x,this.y,0,5));
+				this.timeLastFired = d.getTime();
 			}
 		};
 		var fireL = function(){
-			if (this.bullets.length < p.maxBullets){
+			var d = new Date();
+			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
 				this.bullets.push(this.makeBullet(this.x,this.y,-5,0));
+				this.timeLastFired = d.getTime();
 			}
 		};
 		var fireR = function(){
-			if (this.bullets.length < p.maxBullets){
+			var d = new Date();
+			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
 				this.bullets.push(this.makeBullet(this.x,this.y,5,0));
+				this.timeLastFired = d.getTime();
 			}
 		};
 		var drawPlayer = function(ctx){
@@ -430,6 +506,8 @@ app.main = {
 		p.drawShadow = drawShadow;
 		p.gotHit = false;
 		p.timeGotHit = 0;
+		p.timeLastFired = 0;
+		p.fireRate = 500;
 		
 		return p;
 	},
@@ -541,7 +619,7 @@ app.main = {
 			}
 			
 			if(e.started == true){
-				console.log(i);
+				//console.log(i);
 			}
 			
 			if(e.started == true && e.alive == true){
@@ -592,6 +670,7 @@ app.main = {
 					this.PLAYER.health -= this.enemies[j].attackPower; //decrement health
 						if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
 							this.PLAYER.health = 0;
+							this.totalScore = 0;
 							this.gameState = this.GAME_STATE.ROUND_OVER;
 						}
 					var d = new Date();
@@ -606,6 +685,7 @@ app.main = {
 					b.live = false;
 					if(e.health <= 0){
 						e.alive = false;
+						this.totalScore = this.totalScore + 1;
 					}
 				}
 			}
