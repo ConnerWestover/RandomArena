@@ -82,8 +82,6 @@ app.main = {
 
 	//  Part II - #2,3,4
 	doMousedown: function(e){
-
-		this.sound.playBGAudio();
 	
 		if (this.paused){
 			this.paused = false;
@@ -106,23 +104,23 @@ app.main = {
 
 		if(this.gameState == this.GAME_STATE.MAIN_MENU){
 			if (mouse.x > this.WIDTH/8 && mouse.x < this.WIDTH/8 + this.WIDTH*3/4 &&
-			    mouse.y > this.HEIGHT/8  && mouse.y < this.HEIGHT/8 + this.HEIGHT/6){
+			    mouse.y > this.HEIGHT/8 + 30  && mouse.y < this.HEIGHT/8 + 30 + this.HEIGHT/6){
 					
 				this.gameState = this.GAME_STATE.DEFAULT;
 				this.reset();
 				
 			} else if (mouse.x > this.WIDTH/8 && mouse.x < this.WIDTH/8 + this.WIDTH*3/4 &&
-			    mouse.y > this.HEIGHT/8 + this.HEIGHT/6 + 15 && mouse.y < this.HEIGHT/8 + this.HEIGHT/6 + 15 + this.HEIGHT/6){
+			    mouse.y > this.HEIGHT/8 + 30 + this.HEIGHT/6 + 15 && mouse.y < this.HEIGHT/8 + 30 + this.HEIGHT/6 + 15 + this.HEIGHT/6){
 				
 				this.gameState = this.GAME_STATE.INSTRUCTIONS;
 				
 			} else if (mouse.x > this.WIDTH/8 && mouse.x < this.WIDTH/8 + this.WIDTH*3/4 &&
-			    mouse.y > this.HEIGHT/8 + this.HEIGHT*2/6 + 30 && mouse.y < this.HEIGHT/8  + this.HEIGHT*2/6 + 30 + this.HEIGHT/6){
+			    mouse.y > this.HEIGHT/8 + 30 + this.HEIGHT*2/6 + 30 && mouse.y < this.HEIGHT/8 + 30  + this.HEIGHT*2/6 + 30 + this.HEIGHT/6){
 				
 				this.gameState = this.GAME_STATE.OPTIONS;
 				
 			} else if (mouse.x > this.WIDTH/8 && mouse.x < this.WIDTH/8 + this.WIDTH*3/4 &&
-			    mouse.y > this.HEIGHT/8  + this.HEIGHT*3/6 + 45 && mouse.y < this.HEIGHT/8  + this.HEIGHT*3/6 + 45 + this.HEIGHT/6){
+			    mouse.y > this.HEIGHT/8 + 30  + this.HEIGHT*3/6 + 45 && mouse.y < this.HEIGHT/8 + 30  + this.HEIGHT*3/6 + 45 + this.HEIGHT/6){
 				
 				this.gameState = this.GAME_STATE.ABOUT;
 				
@@ -141,6 +139,7 @@ app.main = {
 	init : function() {
 		console.log("app.main.init() called");
 		// initialize properties
+		this.sound.playBGAudio();
 		this.canvas = document.querySelector('canvas');
 		this.canvas.width = this.WIDTH;
 		this.canvas.height = this.HEIGHT;
@@ -369,7 +368,6 @@ app.main = {
 		} // end if
 	
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
-			ctx.save();
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			if (this.PLAYER.health <= 0){
@@ -408,6 +406,7 @@ app.main = {
 				ctx.closePath();
 				ctx.fill();
 				ctx.stroke();
+				ctx.restore();
 			};
 			
 			var drawShadow = function(ctx){
@@ -572,7 +571,7 @@ app.main = {
 		
 		var p = {};
 		p.draw = drawPlayer;
-		p.speed = 90;
+		p.speed = 140;
 		p.x = this.WIDTH/2;
 		p.y = this.HEIGHT/2;
 		p.moveX = movePlayerX;
@@ -717,10 +716,10 @@ app.main = {
 			e.xSpeed /= mag;
 			e.ySpeed /= mag;
 			
-			e.speed = Math.floor(getRandom(30, 80));
+			e.speed = Math.floor(getRandom(30, 120));
 			
-			e.health = 2;
-			e.attackPower = 1;
+			e.health = Math.floor(getRandom(1, 5));
+			e.attackPower = Math.floor(getRandom(1, 3));;
 			e.radius = this.ENEMY.radius;
 			
 			e.draw = enemyDraw;
@@ -763,7 +762,7 @@ app.main = {
 			var d = new Date();
 			var n = d.getTime();
 			
-			if((e.startTime + i*1000) <= n){
+			if((e.startTime + i*getRandom(500,1000)) <= n){
 				e.started = true;
 			}
 			
@@ -816,13 +815,14 @@ app.main = {
 			if (!this.PLAYER.gotHit && 
 				Math.abs(this.PLAYER.x - this.enemies[j].x) < this.PLAYER.radius + this.enemies[j].radius &&
 				Math.abs(this.PLAYER.y - this.enemies[j].y) < this.PLAYER.radius + this.enemies[j].radius){
-					this.PLAYER.health -= this.enemies[j].attackPower; //decrement health
-						if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
-							this.PLAYER.health = 0;
-							this.roundScore = this.totalScore;
-							this.totalScore = 0;
-							this.gameState = this.GAME_STATE.ROUND_OVER;
-						}
+					this.PLAYER.health -= this.enemies[j].attackPower; //decrement					health
+					this.sound.playPlayerHurtEffect();
+					if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
+						this.PLAYER.health = 0;
+						this.roundScore = this.totalScore;
+						this.totalScore = 0;
+						this.gameState = this.GAME_STATE.ROUND_OVER;
+					}
 					var d = new Date();
 					this.PLAYER.timeGotHit = d.getTime();
 					this.PLAYER.gotHit = true;
@@ -832,6 +832,7 @@ app.main = {
 				var b = this.PLAYER.bullets[i];
 				if (Math.abs(b.x - e.x) < b.radius + e.radius && Math.abs(b.y - e.y) < b.radius + e.radius){
 					e.health -= b.power;
+					this.sound.playEnemyHurtEffect();
 					b.live = false;
 					if(e.health <= 0){
 						e.alive = false;
