@@ -29,7 +29,7 @@ app.main = {
 	totalScore: 0,
 	sound: undefined,
 	enemies: [],
-	numEnemies: 20,
+	numEnemies: 0,
 	staggerTime: 0,
 	
 	Emitter : undefined, // required = loaded by main.js
@@ -94,8 +94,12 @@ app.main = {
 		//click one circle
 		
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
-			this.gameState = this.GAME_STATE.DEFAULT;
-			this.reset();
+			if (this.PLAYER.health <= 0){
+				this.gameState = this.GAME_STATE.MAIN_MENU;
+			} else {
+				this.gameState = this.GAME_STATE.DEFAULT;
+				this.reset();
+			}
 			return;
 		}
 		var mouse = getMouse(e);
@@ -105,6 +109,7 @@ app.main = {
 			    mouse.y > this.HEIGHT/8  && mouse.y < this.HEIGHT/8 + this.HEIGHT/6){
 					
 				this.gameState = this.GAME_STATE.DEFAULT;
+				this.reset();
 				
 			} else if (mouse.x > this.WIDTH/8 && mouse.x < this.WIDTH/8 + this.WIDTH*3/4 &&
 			    mouse.y > this.HEIGHT/8 + this.HEIGHT/6 + 15 && mouse.y < this.HEIGHT/8 + this.HEIGHT/6 + 15 + this.HEIGHT/6){
@@ -167,6 +172,7 @@ app.main = {
 	
 	reset: function(){
 		this.roundScore = 0;
+		this.numEnemies += 5;
 		this.enemies = this.makeEnemy(this.numEnemies);
 		this.PLAYER = this.makePlayer();
 	},
@@ -268,18 +274,19 @@ app.main = {
 			
 			ctx.strokeStyle = "black";
 			ctx.lineWidth = 4;
-			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8, this.WIDTH*3/4, this.HEIGHT/6);
-			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8 + this.HEIGHT/6 + 15, this.WIDTH*3/4, this.HEIGHT/6);
-			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8  + this.HEIGHT*2/6 + 30, this.WIDTH*3/4, this.HEIGHT/6);
-			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8  + this.HEIGHT*3/6 + 45, this.WIDTH*3/4, this.HEIGHT/6);
+			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8 + 30, this.WIDTH*3/4, this.HEIGHT/6);
+			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8 + 30 + this.HEIGHT/6 + 15, this.WIDTH*3/4, this.HEIGHT/6);
+			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8 + 30  + this.HEIGHT*2/6 + 30, this.WIDTH*3/4, this.HEIGHT/6);
+			ctx.strokeRect(this.WIDTH/8, this.HEIGHT/8 + 30  + this.HEIGHT*3/6 + 45, this.WIDTH*3/4, this.HEIGHT/6);
 			
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			
-			this.fillText(ctx, "Play", this.WIDTH/2, this.HEIGHT/8+ this.HEIGHT/11, "30pt courier", "black");
-			this.fillText(ctx, "Instructions", this.WIDTH/2, this.HEIGHT/6 + this.HEIGHT/4 - 10, "30pt courier", "black");
-			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT*2/6 + this.HEIGHT/4 + 5, "30pt courier", "black");
-			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT*3/6 + this.HEIGHT/4+ 20, "30pt courier", "black");
+			this.fillText(ctx, "Random Arena", this.WIDTH/2, 50, "50pt Permanent Marker", "red");
+			this.fillText(ctx, "Play", this.WIDTH/2, this.HEIGHT/8 + 30+ this.HEIGHT/11, "50pt Permanent Marker", "black");
+			this.fillText(ctx, "Instructions", this.WIDTH/2, this.HEIGHT/6 + 30 + this.HEIGHT/4 - 10, "50pt Permanent Marker", "black");
+			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT*2/6 + 30 + this.HEIGHT/4 + 5, "50pt Permanent Marker", "black");
+			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT*3/6 + 30 + this.HEIGHT/4+ 20, "50pt Permanent Marker", "black");
 			ctx.restore();
 		} else if (this.gameState == this.GAME_STATE.INSTRUCTIONS){
 			ctx.save();
@@ -288,15 +295,15 @@ app.main = {
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			ctx.lineWidth = 4;
-			this.fillText(ctx, "Instructions", this.WIDTH/2, this.HEIGHT/8, "60pt courier", "black");
-			this.fillText(ctx, "WASD to move the player", this.WIDTH/2, this.HEIGHT*2/5, "30pt courier", "black");
-			this.fillText(ctx, "Arrow Keys to fire bullets", this.WIDTH/2, this.HEIGHT*2/5 - 40, "30pt courier", "black");
-			this.fillText(ctx, "Defeat anyone who enters the arena", this.WIDTH/2, this.HEIGHT*2/5 + 70, "30pt courier", "black");
-			this.fillText(ctx, "Gain points by defeating enemies", this.WIDTH/2, this.HEIGHT*2/5 + 110, "30pt courier", "black");
-			this.fillText(ctx, "Pickup weapons by walking over them", this.WIDTH/2, this.HEIGHT*2/5 + 200, "30pt courier", "black");
-			this.fillText(ctx, "Fight until you drop", this.WIDTH/2, this.HEIGHT*2/5 + 240, "30pt courier", "black");
+			this.fillText(ctx, "Instructions", this.WIDTH/2, this.HEIGHT/8, "60pt Permanent Marker", "black");
+			this.fillText(ctx, "WASD to move the player", this.WIDTH/2, this.HEIGHT*2/5, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Arrow Keys to fire bullets", this.WIDTH/2, this.HEIGHT*2/5 - 40, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Defeat anyone who enters the arena", this.WIDTH/2, this.HEIGHT*2/5 + 70, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Gain points by defeating enemies", this.WIDTH/2, this.HEIGHT*2/5 + 110, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Pickup weapons by walking over them", this.WIDTH/2, this.HEIGHT*2/5 + 200, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Fight until you drop", this.WIDTH/2, this.HEIGHT*2/5 + 240, "30pt Permanent Marker", "black");
 			
-			this.fillText(ctx, "Back", 60, 30, "30pt courier", "black");
+			this.fillText(ctx, "Back", 60, 30, "30pt Permanent Marker", "black");
 			ctx.strokeRect(0,0,130,60);
 			
 			ctx.restore();
@@ -307,10 +314,10 @@ app.main = {
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			ctx.lineWidth = 4;
-			this.fillText(ctx, "Back", 60, 30, "30pt courier", "black");
-			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT/8, "60pt courier", "black");
-			this.fillText(ctx, "This section is currently", this.WIDTH/2, this.HEIGHT*2/5, "30pt courier", "black");
-			this.fillText(ctx, "under construction", this.WIDTH/2, this.HEIGHT*2/5+40, "30pt courier", "black");
+			this.fillText(ctx, "Back", 60, 30, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT/8, "60pt Permanent Marker", "black");
+			this.fillText(ctx, "This section is currently", this.WIDTH/2, this.HEIGHT*2/5, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "under construction", this.WIDTH/2, this.HEIGHT*2/5+40, "30pt Permanent Marker", "black");
 			ctx.strokeRect(0,0,130,60);
 			ctx.restore();
 		} else if (this.gameState == this.GAME_STATE.ABOUT){
@@ -320,11 +327,11 @@ app.main = {
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			ctx.lineWidth = 4;
-			this.fillText(ctx, "Back", 60, 30, "30pt courier", "black");
-			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT/8, "60pt courier", "black");
-			this.fillText(ctx, "Random Arena was created by:", this.WIDTH/2, this.HEIGHT*2/5, "30pt courier", "black");
-			this.fillText(ctx, "Alexander Huffman", this.WIDTH/2, this.HEIGHT*2/5+40, "30pt courier", "black");
-			this.fillText(ctx, "Conner Westover", this.WIDTH/2, this.HEIGHT*2/5+80, "30pt courier", "black");
+			this.fillText(ctx, "Back", 60, 30, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT/8, "60pt Permanent Marker", "black");
+			this.fillText(ctx, "Random Arena was created by:", this.WIDTH/2, this.HEIGHT*2/5, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Alexander Huffman", this.WIDTH/2, this.HEIGHT*2/5+40, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Conner Westover", this.WIDTH/2, this.HEIGHT*2/5+80, "30pt Permanent Marker", "black");
 			ctx.strokeRect(0,0,130,60);
 			ctx.restore();
 		}
@@ -337,7 +344,7 @@ app.main = {
       	// fillText(this.ctx,string, x, y, css, color)
 		ctx.fillStyle = "white";
 		ctx.fillRect(this.WIDTH - 210, 2.5, 170, 22.5);
-		this.fillText(this.ctx,"Total Score: " + this.totalScore, this.WIDTH - 200, 20, "14pt courier", "black");
+		this.fillText(this.ctx,"Total Score: " + this.totalScore, this.WIDTH - 200, 20, "14pt Permanent Marker", "black");
 		ctx.lineWidth = 3;
 		ctx.strokeStyle = "black";
 		ctx.fillRect(5,5, 200, 40);
@@ -358,15 +365,21 @@ app.main = {
 		if(this.gameState == this.GAME_STATE.BEGIN){
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
-			this.fillText(this.ctx,"To begin, click the screen", this.WIDTH/2, this.HEIGHT/2, "30pt courier", "white");
+			this.fillText(this.ctx,"To begin, click the screen", this.WIDTH/2, this.HEIGHT/2, "30pt Permanent Marker", "white");
 		} // end if
 	
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
 			ctx.save();
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
-			this.fillText(this.ctx,"Round Over", this.WIDTH/2, this.HEIGHT/2 - 40, "30pt courier", "red");
-			this.fillText(this.ctx,"Click to continue", this.WIDTH/2, this.HEIGHT/2, "30pt courier", "red");
+			if (this.PLAYER.health <= 0){
+				this.fillText(this.ctx,"GAME OVER", this.WIDTH/2, this.HEIGHT/2 - 80, "50pt Permanent Marker", "red");
+				this.fillText(this.ctx,"Your final score was: " + this.roundScore, this.WIDTH/2, this.HEIGHT/2 - 20, "30pt Permanent Marker", "black");
+				this.fillText(this.ctx,"Click to return to Main Menu", this.WIDTH/2, this.HEIGHT/2 + 10, "30pt Permanent Marker", "black");
+			} else {
+				this.fillText(this.ctx,"You have completed this round", this.WIDTH/2, this.HEIGHT/2 - 40, "30pt Permanent Marker", "black");
+				this.fillText(this.ctx,"Click to continue", this.WIDTH/2, this.HEIGHT/2, "30pt Permanent Marker", "black");
+			}
 		} // end if
 		
 		ctx.restore(); // NEW
@@ -806,6 +819,7 @@ app.main = {
 					this.PLAYER.health -= this.enemies[j].attackPower; //decrement health
 						if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
 							this.PLAYER.health = 0;
+							this.roundScore = this.totalScore;
 							this.totalScore = 0;
 							this.gameState = this.GAME_STATE.ROUND_OVER;
 						}
@@ -834,7 +848,7 @@ app.main = {
 		for (var j = 0; j < this.enemies.length; j++){
 			if(this.enemies[j].alive == false) dead++;
 		}
-		if(dead == 20){
+		if(dead == this.numEnemies){
 			this.gameState = this.GAME_STATE.ROUND_OVER;
 		}
 	},
@@ -845,7 +859,7 @@ app.main = {
 		ctx.fillRect(0,0,this.WIDTH, this.HEIGHT);
 		ctx.textAlign = "center";
 		ctx.textBaseline= "middle";
-		this.fillText(this.ctx,"...PAUSED...", this.WIDTH/2, this.HEIGHT/2, "40pt courier", "white");
+		this.fillText(this.ctx,"...PAUSED...", this.WIDTH/2, this.HEIGHT/2, "40pt Permanent Marker", "white");
 		ctx.restore();
 	},
 	
