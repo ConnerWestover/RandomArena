@@ -571,7 +571,7 @@ app.main = {
 		
 		var p = {};
 		p.draw = drawPlayer;
-		p.speed = 140;
+		p.speed = 150;
 		p.x = this.WIDTH/2;
 		p.y = this.HEIGHT/2;
 		p.moveX = movePlayerX;
@@ -716,7 +716,7 @@ app.main = {
 			e.xSpeed /= mag;
 			e.ySpeed /= mag;
 			
-			e.speed = Math.floor(getRandom(30, 120));
+			e.speed = Math.floor(getRandom(50, 150));
 			
 			e.health = Math.floor(getRandom(1, 5));
 			e.attackPower = Math.floor(getRandom(1, 3));;
