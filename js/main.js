@@ -3,6 +3,10 @@
 // Description: singleton object
 // This object will be our main "controller" class and will contain references
 // to most of the other objects in the game.
+// Credit Enemy Sprite Sheet to https://andrewphillippi.files.wordpress.com/2013/01/zombiesheet.png
+// another source of same spritesheet https://andrewphillippi.wordpress.com/2013/01/18/project-idea/
+// Credit Player Sprite Sheet to http://knightyamato.deviantart.com/art/Blank-Sprite-Sheet-4-2-129192797 
+// another source of above sprite sheet http://orig12.deviantart.net/9b3c/f/2009/193/f/2/blank_sprite_sheet_4_2_by_knightyamato.png
 
 "use strict";
 
@@ -54,7 +58,7 @@ app.main = {
 		defense: 1,
 		x: 0,
 		y: 0,
-		radius: 15
+		radius: 10
 	},
 	
 	// Part I - #2
@@ -189,7 +193,6 @@ app.main = {
 			if (myKeys.keydown[myKeys.KEYBOARD.KEY_D]){
 				this.PLAYER.moveX(dt);
 			} 
-			
 			if(myKeys.keydown[myKeys.KEYBOARD.KEY_UP]){
 				this.PLAYER.fireUp();
 			}	
@@ -398,6 +401,7 @@ app.main = {
 		
 		var fireU = function(){
 			var d = new Date();
+			this.direction = 0;
 			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
 				this.bullets.push(this.makeBullet(this.x,this.y,0,-5));
 				this.timeLastFired = d.getTime();
@@ -405,6 +409,7 @@ app.main = {
 		};
 		var fireD = function(){
 			var d = new Date();
+			this.direction = 1;
 			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
 				this.bullets.push(this.makeBullet(this.x,this.y,0,5));
 				this.timeLastFired = d.getTime();
@@ -412,6 +417,7 @@ app.main = {
 		};
 		var fireL = function(){
 			var d = new Date();
+			this.direction = 3;
 			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
 				this.bullets.push(this.makeBullet(this.x,this.y,-5,0));
 				this.timeLastFired = d.getTime();
@@ -419,6 +425,7 @@ app.main = {
 		};
 		var fireR = function(){
 			var d = new Date();
+			this.direction = 2;
 			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
 				this.bullets.push(this.makeBullet(this.x,this.y,5,0));
 				this.timeLastFired = d.getTime();
@@ -426,14 +433,37 @@ app.main = {
 		};
 		var drawPlayer = function(ctx){
 			ctx.save();
-			ctx.fillStyle = "red";
-			ctx.strokeStyle = "black";
-			ctx.beginPath();
-			ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
-			ctx.fill();
-			ctx.closePath();
-			ctx.stroke();
+			
+			if(!this.image){
+				ctx.fillStyle = "orange";
+				ctx.fillRect(this.x, this.y, 32, 32);
+			} else {
+				var halfW = 16;
+				var halfH = 16;
+				if(this.direction == 2){
+					ctx.drawImage(this.image,				
+					0 + this.spriteNumber * 32,64,32,32,		 					
+					this.x- halfW, this.y- halfH, 32, 32
+					);
+				} else if (this.direction == 3) {
+					ctx.drawImage(this.image,				
+					0 + this.spriteNumber * 32,32,32,32,		 					
+					this.x- halfW, this.y- halfH, 32, 32
+					);
+				} else if(this.direction == 1){
+					ctx.drawImage(this.image,				
+					0 + this.spriteNumber * 32,0,32,32,		 					
+					this.x- halfW, this.y- halfH, 32, 32
+					);	
+				} else {
+					ctx.drawImage(this.image,					 					
+					0 + this.spriteNumber * 32,96,32,32,		 					
+					this.x- halfW, this.y- halfH, 32, 32
+					);
+				}
+			}
 			ctx.restore();
+			
 			for (var i = 0; i < this.bullets.length; i++){
 				this.bullets[i].draw(ctx);
 			}
@@ -445,7 +475,7 @@ app.main = {
 			ctx.strokeStyle = "black";
 			ctx.globalAlpha = .7;
 			ctx.beginPath();
-			ctx.arc(this.x, this.y+20, this.radius*.9, 0, Math.PI*2, false);
+			ctx.arc(this.x, this.y+ 12, this.radius*.9, 0, Math.PI*2, false);
 			ctx.fill();
 			ctx.closePath();
 			ctx.stroke();
@@ -457,10 +487,20 @@ app.main = {
 		
 		var movePlayerX = function(dt){
 			this.x += this.speed * dt;
+			if(dt > 0){
+				this.direction = 2;
+			} else {
+				this.direction = 3;
+			}
 		};
 		
 		var movePlayerY = function(dt){
 			this.y += this.speed * dt;
+			if(dt > 0){
+				this.direction = 1;
+			} else {
+				this.direction = 0;
+			}
 		};
 		
 		var update = function(dt){
@@ -480,11 +520,19 @@ app.main = {
 				}
 			}
 			
+			var d = new Date();
+			if (d.getTime() - this.timeLastSpriteChanged > 250){
+				this.timeLastSpriteChanged = d.getTime();
+				this.spriteNumber++;
+				if (this.spriteNumber > 2){
+					this.spriteNumber = 0;
+				}
+			}
 		}
 		
 		var p = {};
 		p.draw = drawPlayer;
-		p.speed = 200;
+		p.speed = 90;
 		p.x = this.WIDTH/2;
 		p.y = this.HEIGHT/2;
 		p.moveX = movePlayerX;
@@ -494,7 +542,7 @@ app.main = {
 		p.weapon = "gun";
 		p.attackPower = 1;
 		p.defense = 1;
-		p.radius = 30;
+		p.radius = 12;
 		p.maxBullets = 10;
 		p.bullets = [];
 		p.makeBullet = makeBullet;
@@ -509,17 +557,55 @@ app.main = {
 		p.timeLastFired = 0;
 		p.fireRate = 500;
 		
+		p.timeLastSpriteChanged = 0;
+		p.spriteNumber = 0;
+		p.direction = 0; // 0 = up, 1 = down, 2 = right, 3 = left
+			
+		var image = new Image();
+		image.src = app.IMAGES['playerImage'];
+			
+		p.image = image;
+		
 		return p;
 	},
 	
 	makeEnemy: function(num){
+		
 		var enemyDraw = function(ctx){
 			ctx.save();
-			ctx.fillStyle = "green";
-			ctx.beginPath();
-			ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
-			ctx.fill();
-			ctx.closePath();
+			if(!this.image){
+				ctx.fillStyle = "orange";
+				ctx.fillRect(this.x, this.y, 32, 32);
+			} else {
+				var halfW = 16;
+				var halfH = 16;
+				if( Math.abs(this.xSpeed) >= Math.abs(this.ySpeed)){
+					if(this.xSpeed >= 0){
+						ctx.drawImage(this.image,				
+						0 + this.spriteNumber * 32 + this.column * 96,64 + this.row * 128,32,32,		 					
+						this.x- halfW, this.y- halfH, 32, 32
+						);
+					} else {
+						ctx.drawImage(this.image,				
+						0 + this.spriteNumber * 32 + this.column * 96,32 + this.row * 128,32,32,		 					
+						this.x- halfW, this.y- halfH, 32, 32
+						);
+					}
+				} else {
+					if(this.ySpeed >= 0){
+						ctx.drawImage(this.image,				
+						0 + this.spriteNumber * 32 + this.column * 96,0 + this.row * 128,32,32,		 					
+						this.x- halfW, this.y- halfH, 32, 32
+						);	
+					} else {
+						ctx.drawImage(this.image,					 					
+						0 + this.spriteNumber * 32 + this.column * 96,96 + this.row * 128,32,32,		 					
+						this.x- halfW, this.y- halfH, 32, 32
+						);
+					}
+				}
+			}
+			
 			ctx.restore();
 		};
 		
@@ -528,7 +614,7 @@ app.main = {
 			ctx.fillStyle = "black";
 			ctx.beginPath();
 			ctx.globalAlpha = .7;
-			ctx.arc(this.x, this.y + 20, this.radius*.9, 0, Math.PI*2, false);
+			ctx.arc(this.x, this.y + 12, this.radius*.9, 0, Math.PI*2, false);
 			ctx.fill();
 			ctx.closePath();
 			ctx.restore();
@@ -544,6 +630,16 @@ app.main = {
 			
 			this.x += this.xSpeed * this.speed * dt;
 			this.y += this.ySpeed * this.speed * dt;
+			
+			//update walk cycle
+			var d = new Date();
+			if (d.getTime() - this.timeLastSpriteChanged > 10000/this.speed){
+				this.timeLastSpriteChanged = d.getTime();
+				this.spriteNumber++;
+				if (this.spriteNumber > 2){
+					this.spriteNumber = 0;
+				}
+			}
 		}
 		
 		var array = [];
@@ -590,6 +686,19 @@ app.main = {
 			e.draw = enemyDraw;
 			e.drawShadow = enemyDrawShadow;
 			e.move = enemyMove;
+			
+			e.width = 32;	//Width in pixels
+			e.height = 32;  //height in pixels
+			
+			e.timeLastSpriteChanged = 0;
+			e.spriteNumber = 0;
+			
+			var image = new Image();
+			image.src = app.IMAGES['enemyImage'];
+			
+			e.image = image;
+			e.row = Math.floor(getRandom(0,2));
+			e.column = Math.floor(getRandom(0,4));
 			
 			//Object.seal(e);
 			array.push(e);

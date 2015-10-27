@@ -1,6 +1,11 @@
 // The myKeys object will be in the global scope - it makes this script 
 // really easy to reuse between projects
 
+// Credit Enemy Sprite Sheet to https://andrewphillippi.files.wordpress.com/2013/01/zombiesheet.png
+// another source of same spritesheet https://andrewphillippi.wordpress.com/2013/01/18/project-idea/
+// Credit Player Sprite Sheet to http://knightyamato.deviantart.com/art/Blank-Sprite-Sheet-4-2-129192797 
+// another source of above sprite sheet http://orig12.deviantart.net/9b3c/f/2009/193/f/2/blank_sprite_sheet_4_2_by_knightyamato.png
+
 "use strict";
 
 var myKeys = {};
@@ -49,3 +54,8 @@ window.addEventListener("keyup",function(e){
 
 	
 });
+
+app.IMAGES = {
+	enemyImage: "media/zombiesheet.png",
+	playerImage: "media/playersheet.png"
+};

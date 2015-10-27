@@ -13,9 +13,19 @@ var app = app || {};
 
 window.onload = function(){
 	console.log("window.onload called");
-	app.sound.init();
-	app.main.sound = app.sound;
-	app.main.init();
+	
+	app.queue = new createjs.LoadQueue(false);
+	app.queue.installPlugin(createjs.Sound);
+	app.queue.on("complete", function(){
+		console.log("images loaded called");
+		app.sound.init();
+		app.main.sound = app.sound;
+		app.main.init();
+	});
+
+	app.queue.loadManifest([
+     {id: "enemyImage", src:"media/zombiesheet.png"}  
+	]);
 }
 
 window.onblur = function(){
