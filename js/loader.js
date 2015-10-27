@@ -20,6 +20,7 @@ window.onload = function(){
 		console.log("images loaded called");
 		app.sound.init();
 		app.main.sound = app.sound;
+		app.main.Emitter = app.Emitter;
 		app.main.init();
 	});
 
