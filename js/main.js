@@ -28,6 +28,11 @@ app.main = {
 	numEnemies: 20,
 	staggerTime: 0,
 	
+	Emitter : undefined, // required = loaded by main.js
+	pulsar : undefined, 
+	exhaust : undefined,
+	
+	
 	PLAYER: {
 		health: 10,
 		weapon: "none",
@@ -137,7 +142,20 @@ app.main = {
 		this.PLAYER = this.makePlayer();
 		//debugger;
 		this.enemies = this.makeEnemy(this.numEnemies);
-			
+		
+		this.pulsar = new this.Emitter();
+		this.pulsar.red = 255;
+		this.pulsar.minXspeed = this.pulsar.minYspeed = -0.25;
+		this.pulsar.maxXspeed = this.pulsar.maxYspeed = 0.25;
+		this.pulsar.lifetime = 500;
+		this.pulsar.expansionRate = 0.05;
+		this.pulsar.numParticles = 100;
+		this.pulsar.xRange = 1;
+		this.pulsar.yRange = 1;
+		this.pulsar.useCircles = true;
+		this.pulsar.useSquares = false;
+		this.pulsar.createParticles({x:this.PLAYER.x, y: this.PLAYER.y});
+		
 		this.reset();
 		
 		this.update();
@@ -324,6 +342,14 @@ app.main = {
 		ctx.fillRect(5,5,200 * (this.PLAYER.health/this.PLAYER.maxHealth),40);
 		ctx.strokeRect(5,5, 200, 40);
 		
+		if(this.PLAYER.gotHit == true){
+			this.pulsar.stopDraw = false;
+		}
+		else{
+			this.pulsar.stopDraw = true;
+		}
+		
+		this.pulsar.updateAndDraw(this.ctx, {x:this.PLAYER.x, y: this.PLAYER.y});
 		
 		ctx.fillStyle = "white";
 		if(this.gameState == this.GAME_STATE.BEGIN){
@@ -475,6 +501,7 @@ app.main = {
 			
 			if (this.gotHit){
 				var d = new Date();
+				//this.pulsar.updateAndDraw(this.ctx, {x:this.PLAYER.x, y: this.PLAYER.y});
 				if (d.getTime() - this.timeGotHit > 1000){
 					this.gotHit = false;
 				}
