@@ -16,8 +16,8 @@ var app = app || {};
 
 app.main = {
 	//  properties
-    WIDTH : 920, 
-    HEIGHT: 640,
+    WIDTH : 1200, 
+    HEIGHT: 920,
     canvas: undefined,
     ctx: undefined,
    	lastTime: 0, // used by calculateDeltaTime() 
@@ -31,6 +31,10 @@ app.main = {
 	enemies: [],
 	numEnemies: 0,
 	staggerTime: 0,
+	
+	activeItems:[],
+	itemsOnGround: [],
+	
 	
 	Emitter : undefined, // required = loaded by main.js
 	pulsar : undefined, 
@@ -89,17 +93,6 @@ app.main = {
 			return;
 		}
 		
-		//click one circle
-		
-		if(this.gameState == this.GAME_STATE.ROUND_OVER){
-			if (this.PLAYER.health <= 0){
-				this.gameState = this.GAME_STATE.MAIN_MENU;
-			} else {
-				this.gameState = this.GAME_STATE.DEFAULT;
-				this.reset();
-			}
-			return;
-		}
 		var mouse = getMouse(e);
 
 		if(this.gameState == this.GAME_STATE.MAIN_MENU){
@@ -229,6 +222,9 @@ app.main = {
 				this.PLAYER.fireRight();
 			} 
 			this.PLAYER.update(dt);
+		
+			this.checkItem();
+			
 			// draw shadows
 			this.drawShadows(this.ctx);
 			//draw things
@@ -242,8 +238,15 @@ app.main = {
 		
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
 			this.drawHUD(this.ctx);
+			if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE]){
+				if (this.PLAYER.health <= 0){
+					this.gameState = this.GAME_STATE.MAIN_MENU;
+				} else {
+					this.gameState = this.GAME_STATE.DEFAULT;
+					this.reset();
+				}
+			}
 		}
-		
 	},
 	
 	drawBackground: function(ctx){
@@ -373,10 +376,10 @@ app.main = {
 			if (this.PLAYER.health <= 0){
 				this.fillText(this.ctx,"GAME OVER", this.WIDTH/2, this.HEIGHT/2 - 80, "50pt Permanent Marker", "red");
 				this.fillText(this.ctx,"Your final score was: " + this.roundScore, this.WIDTH/2, this.HEIGHT/2 - 20, "30pt Permanent Marker", "black");
-				this.fillText(this.ctx,"Click to return to Main Menu", this.WIDTH/2, this.HEIGHT/2 + 10, "30pt Permanent Marker", "black");
+				this.fillText(this.ctx,"Press SPACE to return to Main Menu", this.WIDTH/2, this.HEIGHT/2 + 10, "30pt Permanent Marker", "black");
 			} else {
 				this.fillText(this.ctx,"You have completed this round", this.WIDTH/2, this.HEIGHT/2 - 40, "30pt Permanent Marker", "black");
-				this.fillText(this.ctx,"Click to continue", this.WIDTH/2, this.HEIGHT/2, "30pt Permanent Marker", "black");
+				this.fillText(this.ctx,"Press SPACE to continue", this.WIDTH/2, this.HEIGHT/2, "30pt Permanent Marker", "black");
 			}
 		} // end if
 		
@@ -886,6 +889,10 @@ app.main = {
 		//this.bgAudio.pause();
 		//this.bgAudio.currentTime = 0;
 		this.sound.stopBGAudio();
+	},
+	
+	checkItem: function(){
+		
 	}
-    
+	
 }; // end app.main

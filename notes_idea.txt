@@ -1,0 +1,93 @@
+A Walk In The Forest
+
+Notes: http://www.rpgmakervxace.net/topic/2399-grannys-lists-animal-sprites/
+
+Trippy similar to Alice and Wonderland theme
+
+Rounds or Continuous?
+
+Do rounds, but wave form so player is never not playing.
+
+Are items one use? permanent active? or use on pickup?
+
+Every item used on pickup.
+
+items can have temporary effects or permanent ones. Can override eachother.
+
+for temporary effects last one round? or certain amount of time? 
+
+Both.
+
+Pos, everytime you hit pause something draws. 
+
+Each round there is a theme. 
+IE: one round the screen is darker, the next round there is DDR. so on.
+
+How do our enemies progress?
+
+We start with happy bunnies end with bunny with axe in it's head.
+
+Enemy types: + dead types
+Bunnies
+Bears
+Deer
+Trees
+Wolf
+WereWolf
+Chipmunks
+Honey Badgers
+Mock Turtle from alice in wonderland
+
+BOSS WAVES:
+Mario
+the shining twins
+TOAST
+little red riding hood
+
+
+Power Ups: Shrooms, poop, drink me bottles, eat me pastries
+
+_____________POSITIVE_________________
+Health Up //11/10/2015
+Range Up
+Bigger Bullets 
+Pill that makes enemies smaller or you enemies
+4 way shot - temporary 
+Game changes to snake for 30 seconds, get extra lives by playing snake
+you are on fire and deal damage to enemies//11/10/2015
+player gets smaller but faster
+Faster Fire Rate
+pill that slows everything but you down
+
+_____________NEGATIVE_________________
+Health Down//11/10/2015
+random movement if you are not moving yourself, no inputed movement = random movement
+Range Down
+Smaller Bullets
+Larger Enemies
+Reverse controls
+enemies spit bullets //11/10/2015
+enemies are on fire and do more damage
+Give enemies fake doubles ..transparent
+mirror enemies positions based on players location
+power makes a player shoot in random direction
+Slower Fire Rate
+Player has additional movement while moving
+
+
+_____________NEUTRAL__________________
+Dark theme pill
+Light theme pill 
+Screen Switching from light to dark
+Negative pill Manipulates screen to negative  //11/10/2015
+enemies are on fire
+enemies shoot but does nothing. //11/10/2015
+Pill that slows everything down
+
+Conner - Item Pick Up, manipulate pixels on fire deal damage to enemies
+
+Alex - Enemy Shoots/if bullets are real
+
+Joe - art assets 4 dayz
+
+Andrew - Health Up, Health Down
