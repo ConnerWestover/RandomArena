@@ -17,7 +17,7 @@ var app = app || {};
 app.main = {
 	//  properties
     WIDTH : 1200, 
-    HEIGHT: 860,
+    HEIGHT: 800,
     canvas: undefined,
     ctx: undefined,
    	lastTime: 0, // used by calculateDeltaTime() 
@@ -31,6 +31,8 @@ app.main = {
 	enemies: [],
 	numEnemies: 0,
 	staggerTime: 0,
+	endRound: 0,
+	timeBetweenWaves: 5000,
 	
 	itemsOnGround: [],
 	
@@ -102,6 +104,8 @@ app.main = {
 			    mouse.y > this.HEIGHT/8 + 30  && mouse.y < this.HEIGHT/8 + 30 + this.HEIGHT/6){
 					
 				this.gameState = this.GAME_STATE.DEFAULT;
+				this.PLAYER = this.makePlayer();
+				this.totalScore = 0;
 				this.reset();
 				
 			} else if (mouse.x > this.WIDTH/8 && mouse.x < this.WIDTH/8 + this.WIDTH*3/4 &&
@@ -168,7 +172,6 @@ app.main = {
 		this.roundScore = 0;
 		this.numEnemies += 5;
 		this.enemies = this.makeEnemy(this.numEnemies);
-		this.PLAYER = this.makePlayer();
 	},
 	
 	update: function(){
@@ -202,7 +205,7 @@ app.main = {
 		this.drawMain(this.ctx);
 
 		//GamePlay Drawing Happens
-		if (this.gameState == this.GAME_STATE.DEFAULT){
+		if (this.gameState == this.GAME_STATE.DEFAULT || this.gameState == this.GAME_STATE.ROUND_OVER){
 			//update everyone
 			if(myKeys.keydown[myKeys.KEYBOARD.KEY_W]){
 				this.PLAYER.moveY(-dt);
@@ -232,11 +235,12 @@ app.main = {
 		
 			this.checkItem();
 			this.drawOnGroundItems(this.ctx);
-			// draw shadows
-			this.drawShadows(this.ctx);
 			//draw things
+			if (this.gameState == this.GAME_STATE.DEFAULT){
+				this.drawShadows(this.ctx);
+				this.drawEnemy(this.ctx);
+			}
 			this.PLAYER.draw(this.ctx);
-			this.drawEnemy(this.ctx);
 			//draw hud
 			this.drawHUD(this.ctx);
 			
@@ -291,7 +295,7 @@ app.main = {
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
 			
-			this.fillText(ctx, "Random Arena", this.WIDTH/2, 50, "50pt Permanent Marker", "red");
+			this.fillText(ctx, "Down The Rabbit Hole", this.WIDTH/2, 50, "50pt Permanent Marker", "red");
 			this.fillText(ctx, "Play", this.WIDTH/2, this.HEIGHT/8 + 30+ this.HEIGHT/11, "50pt Permanent Marker", "black");
 			this.fillText(ctx, "Instructions", this.WIDTH/2, this.HEIGHT/6 + 30 + this.HEIGHT/4 - 10, "50pt Permanent Marker", "black");
 			this.fillText(ctx, "Options", this.WIDTH/2, this.HEIGHT*2/6 + 30 + this.HEIGHT/4 + 5, "50pt Permanent Marker", "black");
@@ -850,13 +854,20 @@ app.main = {
 			
 			e.timeLastSpriteChanged = 0;
 			e.spriteNumber = 0;
-			
 			var image = new Image();
-			image.src = app.IMAGES['enemyImage'];
+			if (getRandom(0,1) > .5){
+				image.src = app.IMAGES['enemyImage'];
+				e.row = Math.floor(getRandom(0,2));
+				e.column = Math.floor(getRandom(0,4));
+				e.radius = 10;
+			} else {
+				image.src = app.IMAGES['deer'];
+				e.row = 0;
+				e.column = 0;
+				e.radius = 12;
+			}
 			
 			e.image = image;
-			e.row = Math.floor(getRandom(0,2));
-			e.column = Math.floor(getRandom(0,4));
 			
 			//Object.seal(e);
 			array.push(e);
@@ -958,7 +969,6 @@ app.main = {
 					if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
 						this.PLAYER.health = 0;
 						this.roundScore = this.totalScore;
-						this.totalScore = 0;
 						this.gameState = this.GAME_STATE.ROUND_OVER;
 					}
 					var d = new Date();
@@ -988,7 +998,7 @@ app.main = {
 						this.totalScore = this.totalScore + 1;
 						if(getRandom(0,100) > 50){
 						//Drops Permanent
-							if(getRandom(0,100) > 0){
+							if(getRandom(0,100) > 90){
 								var x = Math.floor(getRandom(0, myPermanentItems.count));
 								console.log(x);
 								if(x == 0){
@@ -1006,7 +1016,7 @@ app.main = {
 							}
 						} else {
 						//Drops Temporary
-							if(getRandom(0,100) > 100){
+							if(getRandom(0,100) > 90){
 								var x = Math.floor(getRandom(0, myTemporaryItems.length));
 								this.makeActiveItem(x, e.x,e.y);
 							}

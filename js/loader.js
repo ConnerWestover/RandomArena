@@ -25,7 +25,8 @@ window.onload = function(){
 	});
 
 	app.queue.loadManifest([
-     {id: "enemyImage", src:"media/zombiesheet.png"}  
+     {id: "enemyImage", src:"media/zombiesheet.png"},
+	 {id: "deer", src:"media/deer.png"}	 
 	]);
 }
 
