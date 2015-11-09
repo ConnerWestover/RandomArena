@@ -40,6 +40,9 @@ app.main = {
 	pulsar : undefined, 
 	exhaust : undefined,
 	
+	eBullActive: false,
+	eBullLethal: false,
+	
 	
 	PLAYER: {
 		health: 10,
@@ -186,6 +189,11 @@ app.main = {
 	 	// 4) UPDATE
 		this.moveEnemy(dt);
 		this.checkForCollisions();
+		
+		//powers check
+		if(this.eBullActive == true){
+			enemyShoot();
+		}
 		
 		// i) draw background	
 		if (this.gameState == this.GAME_STATE.DEFAULT){
@@ -613,6 +621,98 @@ app.main = {
 	
 	makeEnemy: function(num){
 		
+		var makeBullet = function(x,y,xSpeed, ySpeed){
+			var move = function(dt){
+				this.x += this.xSpeed;
+				this.y += this.ySpeed;
+				this.traveled += Math.abs(this.ySpeed);
+				this.traveled += Math.abs(this.xSpeed);
+				
+				if (this.maxDistance < this.traveled){
+					this.live = false;
+				}
+			};
+			
+			var draw = function(ctx){
+				ctx.save();
+				ctx.fillStyle = this.fillStyle;
+				ctx.strokeStyle = "black";
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, false);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+				ctx.restore();
+			};
+			
+			var drawShadow = function(ctx){
+				ctx.save();
+				ctx.fillStyle = "black";
+				ctx.beginPath();
+				ctx.globalAlpha = 0.5;
+				ctx.arc(this.x, this.y + 20 - (20 * (this.traveled/this.maxDistance)), this.radius *.9, 0, Math.PI*2, false);
+				ctx.closePath();
+				ctx.fill();
+				ctx.restore();
+			}
+			
+			var b = {};
+			
+			if(eBullLethal == true){
+				b.fillStyle = "red";
+			}else{
+				b.fillStyle = "yellow";
+			}
+			
+			b.maxDistance = 600;
+			b.traveled = 0;
+			b.power = 1;
+			b.x = this.x;
+			b.y = this.y;
+			b.radius = 5;
+			b.xSpeed = xSpeed;
+			b.ySpeed = ySpeed;
+			b.live = true
+			b.draw = draw;
+			b.drawShadow = drawShadow;
+			b.move = move;
+			
+			return b;
+		};
+		
+		var fireU = function(){
+			var d = new Date();
+			this.direction = 0;
+			if (this.bullets.length < e.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
+				this.bullets.push(this.makeBullet(this.x,this.y,0,-5));
+				this.timeLastFired = d.getTime();
+			}
+		};
+		var fireD = function(){
+			var d = new Date();
+			this.direction = 1;
+			if (this.bullets.length < e.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
+				this.bullets.push(this.makeBullet(this.x,this.y,0,5));
+				this.timeLastFired = d.getTime();
+			}
+		};
+		var fireL = function(){
+			var d = new Date();
+			this.direction = 3;
+			if (this.bullets.length < e.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
+				this.bullets.push(this.makeBullet(this.x,this.y,-5,0));
+				this.timeLastFired = d.getTime();
+			}
+		};
+		var fireR = function(){
+			var d = new Date();
+			this.direction = 2;
+			if (this.bullets.length < e.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
+				this.bullets.push(this.makeBullet(this.x,this.y,5,0));
+				this.timeLastFired = d.getTime();
+			}
+		};
+		
 		var enemyDraw = function(ctx){
 			ctx.save();
 			if(!this.image){
@@ -623,11 +723,13 @@ app.main = {
 				var halfH = 16;
 				if( Math.abs(this.xSpeed) >= Math.abs(this.ySpeed)){
 					if(this.xSpeed >= 0){
+						this.fireDirection = 2;
 						ctx.drawImage(this.image,				
 						0 + this.spriteNumber * 32 + this.column * 96,64 + this.row * 128,32,32,		 					
 						this.x- halfW, this.y- halfH, 32, 32
 						);
 					} else {
+						this.fireDirection = 3;
 						ctx.drawImage(this.image,				
 						0 + this.spriteNumber * 32 + this.column * 96,32 + this.row * 128,32,32,		 					
 						this.x- halfW, this.y- halfH, 32, 32
@@ -635,11 +737,13 @@ app.main = {
 					}
 				} else {
 					if(this.ySpeed >= 0){
+						this.fireDirection = 1;
 						ctx.drawImage(this.image,				
 						0 + this.spriteNumber * 32 + this.column * 96,0 + this.row * 128,32,32,		 					
 						this.x- halfW, this.y- halfH, 32, 32
 						);	
 					} else {
+						this.fireDirection = 0;
 						ctx.drawImage(this.image,					 					
 						0 + this.spriteNumber * 32 + this.column * 96,96 + this.row * 128,32,32,		 					
 						this.x- halfW, this.y- halfH, 32, 32
@@ -729,6 +833,17 @@ app.main = {
 			e.drawShadow = enemyDrawShadow;
 			e.move = enemyMove;
 			
+			e.maxBullets = 2;
+			e.bullets = [];
+			e.makeBullet = makeBullet;
+			e.fireUp = fireU;
+			e.fireDown = fireD;
+			e.fireLeft = fireL;
+			e.fireRight = fireR;
+			e.timeLastFired = 0;
+			e.fireRate = 1000;
+			e.fireDirection = 0;
+			
 			e.width = 32;	//Width in pixels
 			e.height = 32;  //height in pixels
 			
@@ -788,6 +903,22 @@ app.main = {
 		}
 	},
 	
+	enemyShoot: function(){
+		for(var i = 0; i < this.enemies.length; i++){
+			var e = this.enemies[i];
+			
+			if(e.fireDirection == 0){
+				e.fireU;
+			}else if(e.fireDirection == 1){
+				e.fireD;
+			}else if(e.fireDirection == 2){
+				e.fireR;
+			}else{
+				e.fireL;
+			}
+		}
+	},
+	
 	fillText: function(ctx, string, x, y, css, color) {
 		ctx.save();
 		// https://developer.mozilla.org/en-US/docs/Web/CSS/font
@@ -830,6 +961,17 @@ app.main = {
 					this.PLAYER.timeGotHit = d.getTime();
 					this.PLAYER.gotHit = true;
 				}
+			if(this.eBullActive == true){
+				for(var i = 0; i < this.enemies[j].bullets.length; i++){
+					var b = this.enemies[j].bullets[i];
+					if (Math.abs(b.x - this.PLAYER.x) < b.radius + this.PLAYER.radius && Math.abs(b.y - this.PLAYER.y) < b.radius + this.PLAYER.radius){
+						b.live = false;
+						if(this.eBullLethal == true){
+							this.PLAYER.health -= 1;
+						}
+					}
+				}
+			}
 			for (var i = 0; i < this.PLAYER.bullets.length; i++){
 				var e = this.enemies[j];
 				var b = this.PLAYER.bullets[i];
