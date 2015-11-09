@@ -17,7 +17,7 @@ var app = app || {};
 app.main = {
 	//  properties
     WIDTH : 1200, 
-    HEIGHT: 920,
+    HEIGHT: 860,
     canvas: undefined,
     ctx: undefined,
    	lastTime: 0, // used by calculateDeltaTime() 
@@ -32,7 +32,6 @@ app.main = {
 	numEnemies: 0,
 	staggerTime: 0,
 	
-	activeItems:[],
 	itemsOnGround: [],
 	
 	
@@ -224,7 +223,7 @@ app.main = {
 			this.PLAYER.update(dt);
 		
 			this.checkItem();
-			
+			this.drawOnGroundItems(this.ctx);
 			// draw shadows
 			this.drawShadows(this.ctx);
 			//draw things
@@ -388,7 +387,7 @@ app.main = {
 	
 	
 	makePlayer: function(){
-		var makeBullet = function(x,y,xSpeed, ySpeed){
+		var makeBullet = function(x,y,xSpeed, ySpeed, maxDistance){
 			var move = function(dt){
 				this.x += this.xSpeed;
 				this.y += this.ySpeed;
@@ -424,7 +423,7 @@ app.main = {
 			}
 			
 			var b = {};
-			b.maxDistance = 600;
+			b.maxDistance = maxDistance;
 			b.traveled = 0;
 			b.power = 1;
 			b.x = this.x;
@@ -444,7 +443,7 @@ app.main = {
 			var d = new Date();
 			this.direction = 0;
 			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
-				this.bullets.push(this.makeBullet(this.x,this.y,0,-5));
+				this.bullets.push(this.makeBullet(this.x,this.y,0,-5,this.maxDistance));
 				this.timeLastFired = d.getTime();
 			}
 		};
@@ -452,7 +451,7 @@ app.main = {
 			var d = new Date();
 			this.direction = 1;
 			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
-				this.bullets.push(this.makeBullet(this.x,this.y,0,5));
+				this.bullets.push(this.makeBullet(this.x,this.y,0,5,this.maxDistance));
 				this.timeLastFired = d.getTime();
 			}
 		};
@@ -460,7 +459,7 @@ app.main = {
 			var d = new Date();
 			this.direction = 3;
 			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
-				this.bullets.push(this.makeBullet(this.x,this.y,-5,0));
+				this.bullets.push(this.makeBullet(this.x,this.y,-5,0,this.maxDistance));
 				this.timeLastFired = d.getTime();
 			}
 		};
@@ -468,7 +467,7 @@ app.main = {
 			var d = new Date();
 			this.direction = 2;
 			if (this.bullets.length < p.maxBullets && d.getTime() - this.timeLastFired > this.fireRate){
-				this.bullets.push(this.makeBullet(this.x,this.y,5,0));
+				this.bullets.push(this.makeBullet(this.x,this.y,5,0,this.maxDistance));
 				this.timeLastFired = d.getTime();
 			}
 		};
@@ -598,7 +597,9 @@ app.main = {
 		p.timeGotHit = 0;
 		p.timeLastFired = 0;
 		p.fireRate = 500;
+		p.maxDistance = 600;
 		
+		//Sprite resources
 		p.timeLastSpriteChanged = 0;
 		p.spriteNumber = 0;
 		p.direction = 0; // 0 = up, 1 = down, 2 = right, 3 = left
@@ -819,6 +820,9 @@ app.main = {
 				Math.abs(this.PLAYER.x - this.enemies[j].x) < this.PLAYER.radius + this.enemies[j].radius &&
 				Math.abs(this.PLAYER.y - this.enemies[j].y) < this.PLAYER.radius + this.enemies[j].radius){
 					this.PLAYER.health -= this.enemies[j].attackPower; //decrement					health
+					if (myPermanentItems.OnFire.active == true){
+						myPermanentItems.OnFire.doEffect(this.PLAYER, this.enemies[j]);
+					}
 					this.sound.playPlayerHurtEffect();
 					if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
 						this.PLAYER.health = 0;
@@ -840,10 +844,103 @@ app.main = {
 					if(e.health <= 0){
 						e.alive = false;
 						this.totalScore = this.totalScore + 1;
+						if(getRandom(0,100) > 50){
+						//Drops Permanent
+							if(getRandom(0,100) > 0){
+								var x = Math.floor(getRandom(0, myPermanentItems.count));
+								console.log(x);
+								if(x == 0){
+									var item = myPermanentItems.OnFire;
+									item.onGround = true;
+									item.x = e.x;
+									item.y = e.y;
+								} else if (x == 1){
+								
+								} else if (x == 2){
+								
+								} else if (x == 3){
+								
+								}
+							}
+						} else {
+						//Drops Temporary
+							if(getRandom(0,100) > 100){
+								var x = Math.floor(getRandom(0, myTemporaryItems.length));
+								this.makeActiveItem(x, e.x,e.y);
+							}
+						}
+					}
+				}
+			}
+			for (var i = 0; i < this.itemsOnGround.length; i++){
+				if (Math.abs(this.PLAYER.x - this.itemsOnGround[i].x) < this.PLAYER.radius + this.itemsOnGround[i].radius &&
+					Math.abs(this.PLAYER.y - this.itemsOnGround[i].y) < this.PLAYER.radius + this.itemsOnGround[i].radius){
+					this.itemsOnGround[i].onGround = false;
+					this.itemsOnGround[i].doEffect(this.PLAYER);
+				}
+			}
+			for (var i = 0; i < myPermanentItems.count; i++){
+				if (i == 0){
+					var item = myPermanentItems.OnFire;
+					if (Math.abs(this.PLAYER.x - item.x) < this.PLAYER.radius + item.radius &&
+						Math.abs(this.PLAYER.y - item.y) < this.PLAYER.radius + item.radius){
+						if(item.onGround == true){
+							item.onGround = false;
+							item.active = true;
+						}
 					}
 				}
 			}
 		}
+	},
+	
+	makeActiveItem: function(index, x, y){
+		var item = myTemporaryItems[index];
+		item.onGround = true;
+		item.y = y;
+		item.x = x;
+		this.itemsOnGround.push(item);
+	},
+	
+	drawOnGroundItems: function(ctx){
+		for (var i = 0; i < this.itemsOnGround.length; i++){
+			var item = this.itemsOnGround[i];
+			if(item.onGround == true){
+				ctx.save();
+				ctx.fillStyle = "green";
+				ctx.beginPath();
+				ctx.arc(item.x, item.y, item.radius, 0, 2* Math.PI, false);
+				ctx.closePath();
+				ctx.fill();
+				ctx.restore();
+			}
+		}
+		for (var i = 0; i < myPermanentItems.count; i++){
+			if (i == 0){
+				var item = myPermanentItems.OnFire;
+				if(item.onGround == true){
+					ctx.save();
+					ctx.fillStyle = "blue";
+					ctx.beginPath();
+					ctx.arc(item.x, item.y, item.radius, 0, 2* Math.PI, false);
+					ctx.closePath();
+					ctx.fill();
+					ctx.restore();
+				}
+			} else if (i == 1) {
+				var item = myPermanentItems.OnFire;
+				if(item.onGround == true){
+					ctx.save();
+					ctx.fillStyle = "blue";
+					ctx.beginPath();
+					ctx.arc(item.x, item.y, item.radius, 0, 2* Math.PI, false);
+					ctx.closePath();
+					ctx.fill();
+					ctx.restore();
+				}
+			}
+		}
+		
 	},
 	
 	//check if all enemies have been killed
