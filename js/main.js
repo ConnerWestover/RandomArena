@@ -194,7 +194,7 @@ app.main = {
 		
 		//powers check
 		if(this.eBullActive == true){
-			enemyShoot();
+			this.enemyShoot();
 		}
 		
 		// i) draw background	
@@ -758,6 +758,9 @@ app.main = {
 			}
 			
 			ctx.restore();
+			for (var i = 0; i < this.bullets.length; i++){
+				this.bullets[i].draw(ctx);
+			}
 		};
 		
 		var enemyDrawShadow = function(ctx){
@@ -769,9 +772,17 @@ app.main = {
 			ctx.fill();
 			ctx.closePath();
 			ctx.restore();
+			for (var i = 0; i < this.bullets.length; i++){
+				this.bullets[i].drawShadow(ctx);
+			}
 		};
 		
 		var enemyMove = function(dt){
+			for (var i = 0; i < this.bullets.length; i++){
+				this.bullets[i].move(dt);
+				if(this.bullets[i].live == false) this.bullets.splice(i, 1);
+			}
+		
 			this.xSpeed = app.main.PLAYER.x - this.x;
 			this.ySpeed = app.main.PLAYER.y - this.y;
 			
@@ -917,16 +928,15 @@ app.main = {
 	
 	enemyShoot: function(){
 		for(var i = 0; i < this.enemies.length; i++){
-			var e = this.enemies[i];
-			
+		var e = this.enemies[i];
 			if(e.fireDirection == 0){
-				e.fireU;
+				e.fireUp;
 			}else if(e.fireDirection == 1){
-				e.fireD;
+				e.fireDown;
 			}else if(e.fireDirection == 2){
-				e.fireR;
+				e.fireRight;
 			}else{
-				e.fireL;
+				e.fireLeft;
 			}
 		}
 	},
@@ -1007,11 +1017,17 @@ app.main = {
 									item.x = e.x;
 									item.y = e.y;
 								} else if (x == 1){
-								
+									var item = myPermanentItems.EnemyFiresBulletsNonLethal;
+									item.onGround = true;
+									item.x = e.x;
+									item.y = e.y;
 								} else if (x == 2){
-								
+									var item = myPermanentItems.EnemyFiresBulletsLethal;
+									item.onGround = true;
+									item.x = e.x;
+									item.y = e.y;
 								} else if (x == 3){
-								
+
 								}
 							}
 						} else {
@@ -1024,6 +1040,8 @@ app.main = {
 					}
 				}
 			}
+			
+			//ITEMS
 			for (var i = 0; i < this.itemsOnGround.length; i++){
 				if (Math.abs(this.PLAYER.x - this.itemsOnGround[i].x) < this.PLAYER.radius + this.itemsOnGround[i].radius &&
 					Math.abs(this.PLAYER.y - this.itemsOnGround[i].y) < this.PLAYER.radius + this.itemsOnGround[i].radius){
@@ -1034,6 +1052,24 @@ app.main = {
 			for (var i = 0; i < myPermanentItems.count; i++){
 				if (i == 0){
 					var item = myPermanentItems.OnFire;
+					if (Math.abs(this.PLAYER.x - item.x) < this.PLAYER.radius + item.radius &&
+						Math.abs(this.PLAYER.y - item.y) < this.PLAYER.radius + item.radius){
+						if(item.onGround == true){
+							item.onGround = false;
+							item.active = true;
+						}
+					}
+				} else if (i == 1){
+					var item = myPermanentItems.EnemyFiresBulletsNonLethal;
+					if (Math.abs(this.PLAYER.x - item.x) < this.PLAYER.radius + item.radius &&
+						Math.abs(this.PLAYER.y - item.y) < this.PLAYER.radius + item.radius){
+						if(item.onGround == true){
+							item.onGround = false;
+							item.active = true;
+						}
+					}
+				} else if (i == 2){
+					var item = myPermanentItems.EnemyFiresBulletsLethal;
 					if (Math.abs(this.PLAYER.x - item.x) < this.PLAYER.radius + item.radius &&
 						Math.abs(this.PLAYER.y - item.y) < this.PLAYER.radius + item.radius){
 						if(item.onGround == true){
@@ -1080,7 +1116,18 @@ app.main = {
 					ctx.restore();
 				}
 			} else if (i == 1) {
-				var item = myPermanentItems.OnFire;
+				var item = myPermanentItems.EnemyFiresBulletsNonLethal;
+				if(item.onGround == true){
+					ctx.save();
+					ctx.fillStyle = "blue";
+					ctx.beginPath();
+					ctx.arc(item.x, item.y, item.radius, 0, 2* Math.PI, false);
+					ctx.closePath();
+					ctx.fill();
+					ctx.restore();
+				}
+			} else if (i == 2) {
+				var item = myPermanentItems.EnemyFiresBulletsLethal;
 				if(item.onGround == true){
 					ctx.save();
 					ctx.fillStyle = "blue";
@@ -1141,7 +1188,12 @@ app.main = {
 	},
 	
 	checkItem: function(){
-		
+		if ( myPermanentItems.EnemyFiresBulletsNonLethal.active){
+			myPermanentItems.EnemyFiresBulletsNonLethal.doEffect();
+		} 
+		if (myPermanentItems.EnemyFiresBulletsLethal.active){
+			myPermanentItems.EnemyFiresBulletsLethal.doEffect();
+		}
 	}
 	
 }; // end app.main

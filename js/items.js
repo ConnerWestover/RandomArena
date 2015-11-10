@@ -3,7 +3,7 @@
 //Permanent Items
 var myPermanentItems = {
 	
-	count:1,
+	count:3,
 
 	//-----------Positive-----------
 	OnFire: {
@@ -18,9 +18,32 @@ var myPermanentItems = {
 				enemy.alive = false;
 			}
 		}
-	}
+	},
 	//-----------Negative-----------
-	
+	EnemyFiresBulletsLethal: {
+		x: 0,
+		y: 0,
+		radius: 5,
+		onGround: false,
+		active: true,
+		doEffect: function(){
+			app.main.eBullActive = true;
+			app.main.eBullLethal = true;
+			myPermanentItems.EnemyFiresBulletsNonLethal = false;
+		}
+	},
+	EnemyFiresBulletsNonLethal: {
+		x: 0,
+		y: 0,
+		radius: 5,
+		onGround: false,
+		active: false,
+		doEffect: function(){
+			app.main.eBullActive = true;
+			app.main.eBullLethal = false;
+			myPermanentItems.EnemyFiresBulletsLethal = false;
+		}
+	}
 	//-----------Neutral------------
 
 };
