@@ -63,6 +63,22 @@ var RangeUp = {
 		this.active = false;
 	}
 };
+
+var SlowEnemy = {
+	x: 0,
+	y: 0,
+	radius: 5,
+	onGround: false,
+	slowEnemy: true,
+	active: false,
+	doEffect: function(){
+		for(var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.speed /= 2;
+		}
+		this.active = false;
+	}
+};
 //-----------Negative-----------
 var RangeDown = {
 	x: 0,
@@ -75,7 +91,25 @@ var RangeDown = {
 		this.active = false;
 	}
 };
+
+var SlowAll = {
+	x: 0,
+	y: 0,
+	radius: 5,
+	onGround: false,
+	slowAll: true,
+	active: false,
+	doEffect: function(player){
+		for(var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.speed /= 2;
+		}
+		player.speed /= 2;
+		this.active = false;
+	}
+};
+
 //-----------Neutral------------
-var myTemporaryItems = [RangeUp, RangeDown];
+var myTemporaryItems = [RangeUp, RangeDown, SlowEnemy, SlowAll];
 
 

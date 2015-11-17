@@ -1028,7 +1028,7 @@ app.main = {
 					if(e.health <= 0){
 						e.alive = false;
 						this.totalScore = this.totalScore + 1;
-						if(getRandom(0,100) > 0){
+						if(getRandom(0,100) < 0){
 						//Drops Permanent
 							if(getRandom(0,100) > 0){
 								var x = Math.floor(getRandom(0, myPermanentItems.count));
@@ -1056,9 +1056,11 @@ app.main = {
 							}
 						} else {
 						//Drops Temporary
-							if(getRandom(0,100) > 100){
+							if(getRandom(0,100) > 0){
 								var x = Math.floor(getRandom(0, myTemporaryItems.length));
 								this.makeActiveItem(x, e.x,e.y);
+								console.log(myTemporaryItems[x]);
+								
 							}
 						}
 					}
@@ -1071,6 +1073,7 @@ app.main = {
 					Math.abs(this.PLAYER.y - this.itemsOnGround[i].y) < this.PLAYER.radius + this.itemsOnGround[i].radius){
 					this.itemsOnGround[i].onGround = false;
 					this.itemsOnGround[i].doEffect(this.PLAYER);
+					console.log(this.PLAYER.speed);
 				}
 			}
 			for (var i = 0; i < myPermanentItems.count; i++){
@@ -1127,6 +1130,9 @@ app.main = {
 				ctx.restore();
 			}
 		}
+		for (var i = 0; i < myTemporaryItems.count; i++){
+		}
+		
 		for (var i = 0; i < myPermanentItems.count; i++){
 			if (i == 0){
 				var item = myPermanentItems.OnFire;
