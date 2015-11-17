@@ -25,11 +25,12 @@ var myPermanentItems = {
 		y: 0,
 		radius: 5,
 		onGround: false,
-		active: true,
+		active: false,
 		doEffect: function(){
+			myPermanentItems.EnemyFiresBulletsNonLethal.active = false;
+			myPermanentItems.EnemyFiresBulletsLethal.active = false;
 			app.main.eBullActive = true;
 			app.main.eBullLethal = true;
-			myPermanentItems.EnemyFiresBulletsNonLethal = false;
 		}
 	},
 	EnemyFiresBulletsNonLethal: {
@@ -41,7 +42,8 @@ var myPermanentItems = {
 		doEffect: function(){
 			app.main.eBullActive = true;
 			app.main.eBullLethal = false;
-			myPermanentItems.EnemyFiresBulletsLethal = false;
+			myPermanentItems.EnemyFiresBulletsNonLethal.active = false;
+			myPermanentItems.EnemyFiresBulletsLethal.active = false;
 		}
 	}
 	//-----------Neutral------------
@@ -58,6 +60,7 @@ var RangeUp = {
 	active: false,
 	doEffect: function(player){
 		player.maxDistance += 20;
+		this.active = false;
 	}
 };
 //-----------Negative-----------
@@ -69,6 +72,7 @@ var RangeDown = {
 	active: false,
 	doEffect: function(player){
 		player.maxDistance -= 20;
+		this.active = false;
 	}
 };
 //-----------Neutral------------

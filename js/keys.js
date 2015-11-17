@@ -58,5 +58,7 @@ window.addEventListener("keyup",function(e){
 app.IMAGES = {
 	enemyImage: "media/zombiesheet.png",
 	playerImage: "media/playersheet.png",
-	deer: "media/deer.png"
+	deer: "media/deer.png",
+	bear: "media/bear.png",
+	bunny: "media/bunny.png"
 };

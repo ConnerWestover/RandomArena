@@ -662,14 +662,13 @@ app.main = {
 			}
 			
 			var b = {};
-			
-			if(eBullLethal == true){
+			if(app.main.eBullLethal == true){
 				b.fillStyle = "red";
 			}else{
 				b.fillStyle = "yellow";
 			}
 			
-			b.maxDistance = 600;
+			b.maxDistance = 300;
 			b.traveled = 0;
 			b.power = 1;
 			b.x = this.x;
@@ -849,7 +848,7 @@ app.main = {
 			e.drawShadow = enemyDrawShadow;
 			e.move = enemyMove;
 			
-			e.maxBullets = 2;
+			e.maxBullets = 1;
 			e.bullets = [];
 			e.makeBullet = makeBullet;
 			e.fireUp = fireU;
@@ -857,7 +856,7 @@ app.main = {
 			e.fireLeft = fireL;
 			e.fireRight = fireR;
 			e.timeLastFired = 0;
-			e.fireRate = 1000;
+			e.fireRate = 2000;
 			e.fireDirection = 0;
 			
 			e.width = 32;	//Width in pixels
@@ -865,14 +864,29 @@ app.main = {
 			
 			e.timeLastSpriteChanged = 0;
 			e.spriteNumber = 0;
+			
+			
+			
+			//IMAGES
 			var image = new Image();
-			if (getRandom(0,1) > .5){
+			var r = getRandom(0,1);
+			/*if (r > .25){
 				image.src = app.IMAGES['enemyImage'];
 				e.row = Math.floor(getRandom(0,2));
 				e.column = Math.floor(getRandom(0,4));
 				e.radius = 10;
-			} else {
+			} else */if (r > .33 & r < .66){
 				image.src = app.IMAGES['deer'];
+				e.row = 0;
+				e.column = 0;
+				e.radius = 12;
+			} else if (r > .66 && r < 1){
+				image.src = app.IMAGES['bunny'];
+				e.row = 0;
+				e.column = 0;
+				e.radius = 12;
+			} else {
+				image.src = app.IMAGES['bear'];
 				e.row = 0;
 				e.column = 0;
 				e.radius = 12;
@@ -930,13 +944,13 @@ app.main = {
 		for(var i = 0; i < this.enemies.length; i++){
 		var e = this.enemies[i];
 			if(e.fireDirection == 0){
-				e.fireUp;
+				e.fireUp();
 			}else if(e.fireDirection == 1){
-				e.fireDown;
+				e.fireDown();
 			}else if(e.fireDirection == 2){
-				e.fireRight;
+				e.fireRight();
 			}else{
-				e.fireLeft;
+				e.fireLeft();
 			}
 		}
 	},
@@ -992,6 +1006,14 @@ app.main = {
 						b.live = false;
 						if(this.eBullLethal == true){
 							this.PLAYER.health -= 1;
+							if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
+								this.PLAYER.health = 0;
+								this.roundScore = this.totalScore;
+								this.gameState = this.GAME_STATE.ROUND_OVER;
+							}
+							var d = new Date();
+							this.PLAYER.timeGotHit = d.getTime();
+							this.PLAYER.gotHit = true;
 						}
 					}
 				}
@@ -1006,23 +1028,25 @@ app.main = {
 					if(e.health <= 0){
 						e.alive = false;
 						this.totalScore = this.totalScore + 1;
-						if(getRandom(0,100) > 50){
+						if(getRandom(0,100) > 0){
 						//Drops Permanent
-							if(getRandom(0,100) > 90){
+							if(getRandom(0,100) > 0){
 								var x = Math.floor(getRandom(0, myPermanentItems.count));
-								console.log(x);
 								if(x == 0){
 									var item = myPermanentItems.OnFire;
+									console.log("On Fire");
 									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
 								} else if (x == 1){
 									var item = myPermanentItems.EnemyFiresBulletsNonLethal;
+									console.log("Non Lethal");
 									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
 								} else if (x == 2){
 									var item = myPermanentItems.EnemyFiresBulletsLethal;
+									console.log("Lethal");
 									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
@@ -1032,7 +1056,7 @@ app.main = {
 							}
 						} else {
 						//Drops Temporary
-							if(getRandom(0,100) > 90){
+							if(getRandom(0,100) > 100){
 								var x = Math.floor(getRandom(0, myTemporaryItems.length));
 								this.makeActiveItem(x, e.x,e.y);
 							}

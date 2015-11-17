@@ -26,7 +26,9 @@ window.onload = function(){
 
 	app.queue.loadManifest([
      {id: "enemyImage", src:"media/zombiesheet.png"},
-	 {id: "deer", src:"media/deer.png"}	 
+	 {id: "deer", src:"media/deer.png"},
+	 {id: "bear", src:"media/bear.png"},
+	 {id: "bunny", src:"media/bunny.png"}
 	]);
 }
 

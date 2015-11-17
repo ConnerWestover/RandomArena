@@ -84,9 +84,9 @@ enemies are on fire
 enemies shoot but does nothing. //11/10/2015
 Pill that slows everything down
 
-Conner - Item Pick Up, manipulate pixels on fire deal damage to enemies
+Conner - Bigger Bullets, Negative Pill
 
-Alex - Enemy Shoots/if bullets are real
+Alex - Pill That slows everything down, Pill that slows everything but you down.
 
 Joe - art assets 4 dayz
 
