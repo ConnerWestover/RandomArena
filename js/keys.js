@@ -60,5 +60,9 @@ app.IMAGES = {
 	playerImage: "media/playersheet.png",
 	deer: "media/deer.png",
 	bear: "media/bear.png",
-	bunny: "media/bunny.png"
+	bunny: "media/bunny.png",
+	pill : "media/pill.png",
+	mushroom : "media/mushroom.png",
+	flower1 : "media/flower1.png",
+	flower2 : "media/flower2.png"
 };

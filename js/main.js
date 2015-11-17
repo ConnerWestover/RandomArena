@@ -34,7 +34,10 @@ app.main = {
 	endRound: 0,
 	timeBetweenWaves: 5000,
 	
+	bulletSize: 5,
+	
 	itemsOnGround: [],
+	invert: false,
 	
 	
 	Emitter : undefined, // required = loaded by main.js
@@ -245,6 +248,8 @@ app.main = {
 			this.drawHUD(this.ctx);
 			
 			this.checkEnemiesDead();
+			
+			//this.manipulatePixels(this.ctx, this.canvas);
 		}
 		
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
@@ -440,7 +445,7 @@ app.main = {
 			b.power = 1;
 			b.x = this.x;
 			b.y = this.y;
-			b.radius = 5;
+			b.radius = app.main.bulletSize;
 			b.xSpeed = xSpeed;
 			b.ySpeed = ySpeed;
 			b.live = true
@@ -504,7 +509,7 @@ app.main = {
 					);
 				} else if(this.direction == 1){
 					ctx.drawImage(this.image,				
-					0 + this.spriteNumber * 32,0,32,32,		 					
+					0 + this.spriteNumber * 32,1,32,31,		 					
 					this.x- halfW, this.y- halfH, 32, 32
 					);	
 				} else {
@@ -1028,9 +1033,9 @@ app.main = {
 					if(e.health <= 0){
 						e.alive = false;
 						this.totalScore = this.totalScore + 1;
-						if(getRandom(0,100) < 0){
+						if(getRandom(0,100) > 70){
 						//Drops Permanent
-							if(getRandom(0,100) > 0){
+							if(getRandom(0,100) > 50){
 								var x = Math.floor(getRandom(0, myPermanentItems.count));
 								if(x == 0){
 									var item = myPermanentItems.OnFire;
@@ -1038,29 +1043,63 @@ app.main = {
 									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
+									var image = new Image();
+									var r = getRandom(0,100);
+									if (r > 0 && r <=25){
+										image.src = app.IMAGES['pill'];
+									} else if (r > 25 && r <= 50){
+										image.src = app.IMAGES['mushroom'];
+									} else if (r > 50 && r <= 75){
+										image.src = app.IMAGES['flower1'];
+									} else {
+										image.src = app.IMAGES['flower2'];
+									}
+									item.image = image;
 								} else if (x == 1){
 									var item = myPermanentItems.EnemyFiresBulletsNonLethal;
 									console.log("Non Lethal");
 									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
+									var image = new Image();
+									var r = getRandom(0,100);
+									if (r > 0 && r <=25){
+										image.src = app.IMAGES['pill'];
+									} else if (r > 25 && r <= 50){
+										image.src = app.IMAGES['mushroom'];
+									} else if (r > 50 && r <= 75){
+										image.src = app.IMAGES['flower1'];
+									} else {
+										image.src = app.IMAGES['flower2'];
+									}
+									item.image = image;
 								} else if (x == 2){
 									var item = myPermanentItems.EnemyFiresBulletsLethal;
 									console.log("Lethal");
 									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
+									var image = new Image();
+									var r = getRandom(0,100);
+									if (r > 0 && r <=25){
+										image.src = app.IMAGES['pill'];
+									} else if (r > 25 && r <= 50){
+										image.src = app.IMAGES['mushroom'];
+									} else if (r > 50 && r <= 75){
+										image.src = app.IMAGES['flower1'];
+									} else {
+										image.src = app.IMAGES['flower2'];
+									}
+									item.image = image;
 								} else if (x == 3){
 
 								}
 							}
 						} else {
 						//Drops Temporary
-							if(getRandom(0,100) > 0){
+							if(getRandom(0,100) > 50){
 								var x = Math.floor(getRandom(0, myTemporaryItems.length));
-								this.makeActiveItem(x, e.x,e.y);
-								console.log(myTemporaryItems[x]);
-								
+								this.makeActiveItem(x, e.x,e.y);								
 							}
 						}
 					}
@@ -1071,9 +1110,12 @@ app.main = {
 			for (var i = 0; i < this.itemsOnGround.length; i++){
 				if (Math.abs(this.PLAYER.x - this.itemsOnGround[i].x) < this.PLAYER.radius + this.itemsOnGround[i].radius &&
 					Math.abs(this.PLAYER.y - this.itemsOnGround[i].y) < this.PLAYER.radius + this.itemsOnGround[i].radius){
-					this.itemsOnGround[i].onGround = false;
-					this.itemsOnGround[i].doEffect(this.PLAYER);
-					console.log(this.PLAYER.speed);
+					if(this.itemsOnGround[i].active != true && this.itemsOnGround[i].onGround == true){
+						this.itemsOnGround[i].onGround = false;
+						this.itemsOnGround[i].doEffect(this.PLAYER);
+					} else {
+						this.itemsOnGround.splice(i, 1);
+					}
 				}
 			}
 			for (var i = 0; i < myPermanentItems.count; i++){
@@ -1114,6 +1156,18 @@ app.main = {
 		item.onGround = true;
 		item.y = y;
 		item.x = x;
+		var image = new Image();
+		var r = getRandom(0,100);
+		if (r > 0 && r <=25){
+			image.src = app.IMAGES['pill'];
+		} else if (r > 25 && r <= 50){
+			image.src = app.IMAGES['mushroom'];
+		} else if (r > 50 && r <= 75){
+			image.src = app.IMAGES['flower1'];
+		} else {
+			image.src = app.IMAGES['flower2'];
+		}
+		item.image = image;
 		this.itemsOnGround.push(item);
 	},
 	
@@ -1122,11 +1176,8 @@ app.main = {
 			var item = this.itemsOnGround[i];
 			if(item.onGround == true){
 				ctx.save();
-				ctx.fillStyle = "green";
-				ctx.beginPath();
-				ctx.arc(item.x, item.y, item.radius, 0, 2* Math.PI, false);
-				ctx.closePath();
-				ctx.fill();
+				ctx.drawImage(item.image,		 					
+					item.x - item.radius/2, item.y - item.radius/2, 10, 10);	
 				ctx.restore();
 			}
 		}
@@ -1215,6 +1266,25 @@ app.main = {
 		//this.bgAudio.pause();
 		//this.bgAudio.currentTime = 0;
 		this.sound.stopBGAudio();
+	},
+	manipulatePixels: function(ctx, canvas){
+		// https://developer.mozilla.org/en-US/docs/Web/API/ImageData
+		var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
+		var length = data.length;
+		var width = imageData.width;
+		for (var i = 0; i < length; i +=4){
+		
+			if(invert){
+				var red = data[i], green = data[i+1], blue = data[i+2];
+				data[i] = 255 - red; // set red value
+				data[i+1] = 255 - green; // set blue value
+				data[i+2] = 255 - blue; // set green value
+				// data[i+3] is the alpha but we’re leaving that alone
+			}
+			
+		}
+		ctx.putImageData(imageData, 0, 0);
 	},
 	
 	checkItem: function(){

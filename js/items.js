@@ -12,6 +12,7 @@ var myPermanentItems = {
 		radius: 5,
 		onGround: false,
 		active: false,
+		image: undefined,
 		doEffect: function(player, enemy){
 			enemy.health -= player.attackPower * 2;
 			if (enemy.health <= 0){
@@ -26,6 +27,7 @@ var myPermanentItems = {
 		radius: 5,
 		onGround: false,
 		active: false,
+		image: undefined,
 		doEffect: function(){
 			myPermanentItems.EnemyFiresBulletsNonLethal.active = false;
 			myPermanentItems.EnemyFiresBulletsLethal.active = false;
@@ -39,6 +41,7 @@ var myPermanentItems = {
 		radius: 5,
 		onGround: false,
 		active: false,
+		image: undefined,
 		doEffect: function(){
 			app.main.eBullActive = true;
 			app.main.eBullLethal = false;
@@ -58,9 +61,25 @@ var RangeUp = {
 	radius: 5,
 	onGround: false,
 	active: false,
+	image: undefined,
 	doEffect: function(player){
 		player.maxDistance += 20;
 		this.active = false;
+		console.log("Range Up");
+	}
+};
+
+var BulletSizeUp = {
+	x: 0,
+	y: 0,
+	radius: 5,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.bulletSize += 1;
+		this.active = false;
+		console.log("Bullet Up");
 	}
 };
 
@@ -71,12 +90,14 @@ var SlowEnemy = {
 	onGround: false,
 	slowEnemy: true,
 	active: false,
+	image: undefined,
 	doEffect: function(){
 		for(var i = 0; i < app.main.enemies.length; i++){
 			var e = app.main.enemies[i];
 			e.speed /= 2;
 		}
 		this.active = false;
+		console.log("Slow Enemy");
 	}
 };
 //-----------Negative-----------
@@ -86,9 +107,11 @@ var RangeDown = {
 	radius: 5,
 	onGround: false,
 	active: false,
+	image: undefined,
 	doEffect: function(player){
 		player.maxDistance -= 20;
 		this.active = false;
+		console.log("Range Down");
 	}
 };
 
@@ -99,6 +122,7 @@ var SlowAll = {
 	onGround: false,
 	slowAll: true,
 	active: false,
+	image: undefined,
 	doEffect: function(player){
 		for(var i = 0; i < app.main.enemies.length; i++){
 			var e = app.main.enemies[i];
@@ -106,10 +130,37 @@ var SlowAll = {
 		}
 		player.speed /= 2;
 		this.active = false;
+		console.log("Speed");
+	}
+};
+
+var BulletSizeDown = {
+	x: 0,
+	y: 0,
+	radius: 5,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.bulletSize -= 1;
+		console.log("Bullet Down");
+		this.active = false;
 	}
 };
 
 //-----------Neutral------------
-var myTemporaryItems = [RangeUp, RangeDown, SlowEnemy, SlowAll];
+var NegativeColor = {
+	x: 0,
+	y: 0,
+	radius: 5,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.invert = !app.main.invert;
+		console.log("Negative");
+		this.active = false;
+	}
+};
 
-
+var myTemporaryItems = [RangeUp, RangeDown, SlowEnemy, SlowAll, NegativeColor, BulletSizeDown, BulletSizeUp];
