@@ -105,11 +105,24 @@ app.main = {
 		if(this.gameState == this.GAME_STATE.MAIN_MENU){
 			if (mouse.x > this.WIDTH/8 && mouse.x < this.WIDTH/8 + this.WIDTH*3/4 &&
 			    mouse.y > this.HEIGHT/8 + 30  && mouse.y < this.HEIGHT/8 + 30 + this.HEIGHT/6){
-					
-				this.gameState = this.GAME_STATE.DEFAULT;
+				
 				this.PLAYER = this.makePlayer();
 				this.totalScore = 0;
+				this.numEnemies = 0;
 				this.reset();
+				//Reset Items
+				this.itemsOnGround = [];
+				myPermanentItems.OnFire.active = false;
+				myPermanentItems.EnemyFiresBulletsLethal.active = false;
+				myPermanentItems.EnemyFiresBulletsNonLethal.active = false;
+				
+				this.eBullLethal = false;
+				this.eBullActive = false;
+				
+				this.bulletSize = 5;
+				
+				this.invert = false;
+				this.gameState = this.GAME_STATE.DEFAULT;
 				
 			} else if (mouse.x > this.WIDTH/8 && mouse.x < this.WIDTH/8 + this.WIDTH*3/4 &&
 			    mouse.y > this.HEIGHT/8 + 30 + this.HEIGHT/6 + 15 && mouse.y < this.HEIGHT/8 + 30 + this.HEIGHT/6 + 15 + this.HEIGHT/6){
@@ -237,7 +250,9 @@ app.main = {
 			this.PLAYER.update(dt);
 		
 			this.checkItem();
-			this.drawOnGroundItems(this.ctx);
+			if(this.gameState != this.GAME_STATE.ROUND_OVER){
+				this.drawOnGroundItems(this.ctx);
+			}
 			//draw things
 			if (this.gameState == this.GAME_STATE.DEFAULT){
 				this.drawShadows(this.ctx);
@@ -269,7 +284,7 @@ app.main = {
 		ctx.fillStyle = "white"; 
 		ctx.strokeStyle = "black";
 		ctx.fillRect(0,0,this.WIDTH,this.HEIGHT); 
-		for (var i = 0; i < this.WIDTH; i+= this.WIDTH/20){
+		/*for (var i = 0; i < this.WIDTH; i+= this.WIDTH/20){
 			ctx.beginPath();
 			ctx.moveTo(i, 0);
 			ctx.lineTo(i, this.HEIGHT);
@@ -283,7 +298,12 @@ app.main = {
 			ctx.lineTo(this.WIDTH, i);
 			ctx.closePath();
 			ctx.stroke();
-		}
+		}*/
+		var image = new Image();
+		image.src = app.IMAGES['ground'];
+		ctx.drawImage(image,					 					
+					0, 0, this.WIDTH, this.HEIGHT
+					);
 	},
 	
 	drawMain: function(ctx){
@@ -545,18 +565,18 @@ app.main = {
 		var movePlayerX = function(dt){
 			this.x += this.speed * dt;
 			if(dt > 0){
-				this.direction = 2;
+				//this.direction = 2;
 			} else {
-				this.direction = 3;
+				//this.direction = 3;
 			}
 		};
 		
 		var movePlayerY = function(dt){
 			this.y += this.speed * dt;
 			if(dt > 0){
-				this.direction = 1;
+				//this.direction = 1;
 			} else {
-				this.direction = 0;
+				//this.direction = 0;
 			}
 		};
 		
@@ -1177,11 +1197,9 @@ app.main = {
 			if(item.onGround == true){
 				ctx.save();
 				ctx.drawImage(item.image,		 					
-					item.x - item.radius/2, item.y - item.radius/2, 10, 10);	
+					item.x - item.radius/2, item.y - item.radius/2, item.radius, item.radius);	
 				ctx.restore();
 			}
-		}
-		for (var i = 0; i < myTemporaryItems.count; i++){
 		}
 		
 		for (var i = 0; i < myPermanentItems.count; i++){

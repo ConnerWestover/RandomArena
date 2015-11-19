@@ -64,5 +64,6 @@ app.IMAGES = {
 	pill : "media/pill.png",
 	mushroom : "media/mushroom.png",
 	flower1 : "media/flower1.png",
-	flower2 : "media/flower2.png"
+	flower2 : "media/flower2.png",
+	ground : "media/grass.png"
 };

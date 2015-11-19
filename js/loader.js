@@ -32,7 +32,8 @@ window.onload = function(){
 	 {id: "pill", src:"media/pill.png"},
 	 {id: "mushroom", src:"media/mushroom.png"},
 	 {id: "flower1", src:"media/flower1.png"},
-	 {id: "flower2", src:"media/flower2.png"}
+	 {id: "flower2", src:"media/flower2.png"},
+	 {id: "ground", src:"media/grass.png"}
 	]);
 }
 

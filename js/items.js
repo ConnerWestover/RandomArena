@@ -9,7 +9,7 @@ var myPermanentItems = {
 	OnFire: {
 		x: 0,
 		y: 0,
-		radius: 5,
+		radius: 20,
 		onGround: false,
 		active: false,
 		image: undefined,
@@ -24,7 +24,7 @@ var myPermanentItems = {
 	EnemyFiresBulletsLethal: {
 		x: 0,
 		y: 0,
-		radius: 5,
+		radius: 20,
 		onGround: false,
 		active: false,
 		image: undefined,
@@ -38,7 +38,7 @@ var myPermanentItems = {
 	EnemyFiresBulletsNonLethal: {
 		x: 0,
 		y: 0,
-		radius: 5,
+		radius: 20,
 		onGround: false,
 		active: false,
 		image: undefined,
@@ -58,7 +58,7 @@ var myPermanentItems = {
 var RangeUp = {
 	x: 0,
 	y: 0,
-	radius: 5,
+	radius: 20,
 	onGround: false,
 	active: false,
 	image: undefined,
@@ -72,7 +72,7 @@ var RangeUp = {
 var BulletSizeUp = {
 	x: 0,
 	y: 0,
-	radius: 5,
+	radius: 20,
 	onGround: false,
 	active: false,
 	image: undefined,
@@ -86,7 +86,7 @@ var BulletSizeUp = {
 var SlowEnemy = {
 	x: 0,
 	y: 0,
-	radius: 5,
+	radius: 20,
 	onGround: false,
 	slowEnemy: true,
 	active: false,
@@ -104,7 +104,7 @@ var SlowEnemy = {
 var RangeDown = {
 	x: 0,
 	y: 0,
-	radius: 5,
+	radius: 20,
 	onGround: false,
 	active: false,
 	image: undefined,
@@ -118,7 +118,7 @@ var RangeDown = {
 var SlowAll = {
 	x: 0,
 	y: 0,
-	radius: 5,
+	radius: 20,
 	onGround: false,
 	slowAll: true,
 	active: false,
@@ -137,7 +137,7 @@ var SlowAll = {
 var BulletSizeDown = {
 	x: 0,
 	y: 0,
-	radius: 5,
+	radius: 20,
 	onGround: false,
 	active: false,
 	image: undefined,
@@ -152,7 +152,7 @@ var BulletSizeDown = {
 var NegativeColor = {
 	x: 0,
 	y: 0,
-	radius: 5,
+	radius: 20,
 	onGround: false,
 	active: false,
 	image: undefined,
