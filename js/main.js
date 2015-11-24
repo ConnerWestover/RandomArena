@@ -35,6 +35,7 @@ app.main = {
 	timeBetweenWaves: 5000,
 	
 	bulletSize: 5,
+	ENEMY_RADIUS: 24,
 	
 	itemsOnGround: [],
 	invert: false,
@@ -120,6 +121,7 @@ app.main = {
 				this.eBullActive = false;
 				
 				this.bulletSize = 5;
+				this.ENEMY_RADIUS = 32;
 				
 				this.invert = false;
 				this.gameState = this.GAME_STATE.DEFAULT;
@@ -264,7 +266,21 @@ app.main = {
 			
 			this.checkEnemiesDead();
 			
-			//this.manipulatePixels(this.ctx, this.canvas);
+			// https://developer.mozilla.org/en-US/docs/Web/API/ImageData
+			var imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+			var data = imageData.data;
+			var length = data.length;
+			var width = imageData.width;
+			if(this.invert){
+				for (var i = 0; i < length; i +=4){
+					var red = data[i], green = data[i+1], blue = data[i+2];
+					data[i] = 255 - red; // set red value
+					data[i+1] = 255 - green; // set blue value
+					data[i+2] = 255 - blue; // set green value
+					// data[i+3] is the alpha but we’re leaving that alone
+				}
+			}
+			this.ctx.putImageData(imageData, 0, 0);
 		}
 		
 		if(this.gameState == this.GAME_STATE.ROUND_OVER){
@@ -515,27 +531,27 @@ app.main = {
 				ctx.fillStyle = "orange";
 				ctx.fillRect(this.x, this.y, 32, 32);
 			} else {
-				var halfW = 16;
-				var halfH = 16;
+				var halfW = this.radius;
+				var halfH = this.radius;
 				if(this.direction == 2){
 					ctx.drawImage(this.image,				
 					0 + this.spriteNumber * 32,64,32,32,		 					
-					this.x- halfW, this.y- halfH, 32, 32
+					this.x- halfW, this.y- halfH, halfW*2, halfH*2
 					);
 				} else if (this.direction == 3) {
 					ctx.drawImage(this.image,				
 					0 + this.spriteNumber * 32,32,32,32,		 					
-					this.x- halfW, this.y- halfH, 32, 32
+					this.x- halfW, this.y- halfH, halfW*2, halfH*2
 					);
 				} else if(this.direction == 1){
 					ctx.drawImage(this.image,				
 					0 + this.spriteNumber * 32,1,32,31,		 					
-					this.x- halfW, this.y- halfH, 32, 32
+					this.x- halfW, this.y- halfH, halfW*2, halfH*2
 					);	
 				} else {
 					ctx.drawImage(this.image,					 					
 					0 + this.spriteNumber * 32,96,32,32,		 					
-					this.x- halfW, this.y- halfH, 32, 32
+					this.x- halfW, this.y- halfH, halfW*2, halfH*2
 					);
 				}
 			}
@@ -620,7 +636,7 @@ app.main = {
 		p.weapon = "gun";
 		p.attackPower = 1;
 		p.defense = 1;
-		p.radius = 12;
+		p.radius = 24;
 		p.maxBullets = 10;
 		p.bullets = [];
 		p.makeBullet = makeBullet;
@@ -748,20 +764,20 @@ app.main = {
 				ctx.fillStyle = "orange";
 				ctx.fillRect(this.x, this.y, 32, 32);
 			} else {
-				var halfW = 16;
-				var halfH = 16;
+				var halfW = this.radius;
+				var halfH = this.radius;
 				if( Math.abs(this.xSpeed) >= Math.abs(this.ySpeed)){
 					if(this.xSpeed >= 0){
 						this.fireDirection = 2;
 						ctx.drawImage(this.image,				
 						0 + this.spriteNumber * 32 + this.column * 96,64 + this.row * 128,32,32,		 					
-						this.x- halfW, this.y- halfH, 32, 32
+						this.x- halfW, this.y- halfH, halfW*2, halfH*2
 						);
 					} else {
 						this.fireDirection = 3;
 						ctx.drawImage(this.image,				
 						0 + this.spriteNumber * 32 + this.column * 96,32 + this.row * 128,32,32,		 					
-						this.x- halfW, this.y- halfH, 32, 32
+						this.x- halfW, this.y- halfH, halfW*2, halfH*2
 						);
 					}
 				} else {
@@ -769,13 +785,13 @@ app.main = {
 						this.fireDirection = 1;
 						ctx.drawImage(this.image,				
 						0 + this.spriteNumber * 32 + this.column * 96,0 + this.row * 128,32,32,		 					
-						this.x- halfW, this.y- halfH, 32, 32
+						this.x- halfW, this.y- halfH, halfW*2, halfH*2
 						);	
 					} else {
 						this.fireDirection = 0;
 						ctx.drawImage(this.image,					 					
 						0 + this.spriteNumber * 32 + this.column * 96,96 + this.row * 128,32,32,		 					
-						this.x- halfW, this.y- halfH, 32, 32
+						this.x- halfW, this.y- halfH, halfW*2, halfH*2
 						);
 					}
 				}
@@ -867,7 +883,7 @@ app.main = {
 			
 			e.health = Math.floor(getRandom(1, 5));
 			e.attackPower = Math.floor(getRandom(1, 3));;
-			e.radius = this.ENEMY.radius;
+			e.radius = this.ENEMY_RADIUS;
 			
 			e.draw = enemyDraw;
 			e.drawShadow = enemyDrawShadow;
@@ -884,13 +900,9 @@ app.main = {
 			e.fireRate = 2000;
 			e.fireDirection = 0;
 			
-			e.width = 32;	//Width in pixels
-			e.height = 32;  //height in pixels
-			
 			e.timeLastSpriteChanged = 0;
 			e.spriteNumber = 0;
-			
-			
+
 			
 			//IMAGES
 			var image = new Image();
@@ -904,17 +916,14 @@ app.main = {
 				image.src = app.IMAGES['deer'];
 				e.row = 0;
 				e.column = 0;
-				e.radius = 12;
 			} else if (r > .66 && r < 1){
 				image.src = app.IMAGES['bunny'];
 				e.row = 0;
 				e.column = 0;
-				e.radius = 12;
 			} else {
 				image.src = app.IMAGES['bear'];
 				e.row = 0;
 				e.column = 0;
-				e.radius = 12;
 			}
 			
 			e.image = image;

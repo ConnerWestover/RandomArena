@@ -163,4 +163,104 @@ var NegativeColor = {
 	}
 };
 
-var myTemporaryItems = [RangeUp, RangeDown, SlowEnemy, SlowAll, NegativeColor, BulletSizeDown, BulletSizeUp];
+var EnemySizeUp = {
+	x: 0,
+	y: 0,
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.ENEMY_RADIUS+=4;
+		for (var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.radius = app.main.ENEMY_RADIUS;
+		}
+		this.active = false;
+		console.log("Enemy Size Up");
+	}
+};
+
+var EnemySizeDown = {
+	x: 0,
+	y: 0,
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.ENEMY_RADIUS-=4;
+		for (var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.radius = app.main.ENEMY_RADIUS;
+		}
+		this.active = false;
+		console.log("Enemy Size Down");
+	}
+};
+
+var PlayerSizeUp = {
+	x: 0,
+	y: 0,
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		player.radius +=4;
+		this.active = false;
+		console.log("Player Size Up");
+	}
+};
+
+var PlayerSizeDown = {
+	x: 0,
+	y: 0,
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		player.radius -= 4;
+		this.active = false;
+		console.log("Player Size Down");
+	}
+};
+
+var EveryoneSizeUp = {
+	x: 0,
+	y: 0,
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.ENEMY_RADIUS+=4;
+		for (var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.radius = app.main.ENEMY_RADIUS;
+		}
+		this.active = false;
+		console.log("Everyone Size Up");
+	}
+};
+
+var EveryoneSizeDown = {
+	x: 0,
+	y: 0,
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.ENEMY_RADIUS-=4;
+		for (var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.radius = app.main.ENEMY_RADIUS;
+		}
+		this.active = false;
+		console.log("Everyone Size Down");
+	}
+};
+
+var myTemporaryItems = [RangeUp, RangeDown, SlowEnemy, SlowAll, NegativeColor, BulletSizeDown, BulletSizeUp,EnemySizeUp,EnemySizeDown,PlayerSizeUp,PlayerSizeDown, EveryoneSizeUp, EveryoneSizeDown];
