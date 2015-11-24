@@ -34,7 +34,7 @@ window.onload = function(){
 	 {id: "mushroom", src:"media/mushroom.png"},
 	 {id: "flower1", src:"media/flower1.png"},
 	 {id: "flower2", src:"media/flower2.png"},
-	 {id: "plant", src:"media/plant.png"},
+	 {id: "plant", src:"media/plant3.png"},
 	 {id: "ground", src:"media/grass.png"}
 	]);
 }

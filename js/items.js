@@ -255,14 +255,26 @@ var EnemySizeUp = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		app.main.ENEMY_RADIUS+=4;
-		for (var i = 0; i < app.main.enemies.length; i++){
-			var e = app.main.enemies[i];
-			e.radius = app.main.ENEMY_RADIUS;
+		if(this.beingUsed == false){
+			app.main.ENEMY_RADIUS+=4;
+			for (var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.radius = app.main.ENEMY_RADIUS;
+			}
+			this.active = false;
+			console.log("Enemy Size Up");
+		}else{
+			app.main.ENEMY_RADIUS -= 4;
+			for (var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.radius = app.main.ENEMY_RADIUS;
+			}
+			this.beingUsed = false;
+			this.timeActive = 0;
 		}
-		this.active = false;
-		console.log("Enemy Size Up");
 	}
 };
 
@@ -273,14 +285,26 @@ var EnemySizeDown = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		app.main.ENEMY_RADIUS-=4;
-		for (var i = 0; i < app.main.enemies.length; i++){
-			var e = app.main.enemies[i];
-			e.radius = app.main.ENEMY_RADIUS;
+		if(this.beingUsed == false){
+			app.main.ENEMY_RADIUS-=4;
+			for (var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.radius = app.main.ENEMY_RADIUS;
+			}
+			this.active = false;
+			console.log("Enemy Size Down");
+		}else{
+			app.main.ENEMY_RADIUS += 4;
+			for (var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.radius = app.main.ENEMY_RADIUS;
+			}
+			this.beingUsed = false;
+			this.timeActive = 0;
 		}
-		this.active = false;
-		console.log("Enemy Size Down");
 	}
 };
 
@@ -291,10 +315,18 @@ var PlayerSizeUp = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		player.radius +=4;
-		this.active = false;
-		console.log("Player Size Up");
+		if(this.beingUsed == false){
+			player.radius +=4;
+			this.active = false;
+			console.log("Player Size Up");
+		}else{
+			player.radius -=4;
+			this.beingUsed = false;
+			this.timeActive = 0;
+		}
 	}
 };
 
@@ -305,10 +337,18 @@ var PlayerSizeDown = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		player.radius -= 4;
-		this.active = false;
-		console.log("Player Size Down");
+		if(this.beingUsed == false){
+			player.radius -= 4;
+			this.active = false;
+			console.log("Player Size Down");
+		}else{
+			player.radius +=4;
+			this.beingUsed = false;
+			this.timeActive = 0;
+		}
 	}
 };
 
@@ -319,14 +359,28 @@ var EveryoneSizeUp = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		app.main.ENEMY_RADIUS+=4;
-		for (var i = 0; i < app.main.enemies.length; i++){
-			var e = app.main.enemies[i];
-			e.radius = app.main.ENEMY_RADIUS;
+		if(this.beingUsed == false){
+			app.main.ENEMY_RADIUS+=4;
+			for (var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.radius = app.main.ENEMY_RADIUS;
+			}
+			player.radius +=4;
+			this.active = false;
+			console.log("Everyone Size Up");
+		}else{
+			app.main.ENEMY_RADIUS-=4;
+			for (var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.radius = app.main.ENEMY_RADIUS;
+			}
+			player.radius -=4;
+			this.beingUsed = false;
+			this.timeActive = 0;
 		}
-		this.active = false;
-		console.log("Everyone Size Up");
 	}
 };
 
@@ -337,14 +391,28 @@ var EveryoneSizeDown = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		app.main.ENEMY_RADIUS-=4;
-		for (var i = 0; i < app.main.enemies.length; i++){
-			var e = app.main.enemies[i];
-			e.radius = app.main.ENEMY_RADIUS;
+		if(this.beingUsed == false){
+			app.main.ENEMY_RADIUS-=4;
+			for (var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.radius = app.main.ENEMY_RADIUS;
+			}
+			player.radius -=4;
+			this.active = false;
+			console.log("Everyone Size Down");
+		}else{
+			app.main.ENEMY_RADIUS+=4;
+			for (var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.radius = app.main.ENEMY_RADIUS;
+			}
+			player.radius +=4;
+			this.beingUsed = false;
+			this.timeActive = 0;
 		}
-		this.active = false;
-		console.log("Everyone Size Down");
 	}
 };
 
