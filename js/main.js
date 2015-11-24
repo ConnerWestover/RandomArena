@@ -35,7 +35,7 @@ app.main = {
 	timeBetweenWaves: 5000,
 	
 	bulletSize: 5,
-	ENEMY_RADIUS: 24,
+	ENEMY_RADIUS: 18,
 	
 	itemsOnGround: [],
 	invert: false,
@@ -636,7 +636,7 @@ app.main = {
 		p.weapon = "gun";
 		p.attackPower = 1;
 		p.defense = 1;
-		p.radius = 24;
+		p.radius = 18;
 		p.maxBullets = 10;
 		p.bullets = [];
 		p.makeBullet = makeBullet;
@@ -907,16 +907,15 @@ app.main = {
 			//IMAGES
 			var image = new Image();
 			var r = getRandom(0,1);
-			/*if (r > .25){
-				image.src = app.IMAGES['enemyImage'];
-				e.row = Math.floor(getRandom(0,2));
-				e.column = Math.floor(getRandom(0,4));
-				e.radius = 10;
-			} else */if (r > .33 & r < .66){
+			if (r <= .25){
+				image.src = app.IMAGES['wolf'];
+				e.row = 0;
+				e.column = 0;
+			} else if (r > .25 & r <= .5){
 				image.src = app.IMAGES['deer'];
 				e.row = 0;
 				e.column = 0;
-			} else if (r > .66 && r < 1){
+			} else if (r > .5 && r <= .75){
 				image.src = app.IMAGES['bunny'];
 				e.row = 0;
 				e.column = 0;
@@ -1069,7 +1068,6 @@ app.main = {
 								if(x == 0){
 									var item = myPermanentItems.OnFire;
 									console.log("On Fire");
-									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
 									var image = new Image();
@@ -1080,14 +1078,16 @@ app.main = {
 										image.src = app.IMAGES['mushroom'];
 									} else if (r > 50 && r <= 75){
 										image.src = app.IMAGES['flower1'];
+									} else if (r > 75 && r <= 100){
+										image.src = app.IMAGES['plant'];
 									} else {
 										image.src = app.IMAGES['flower2'];
 									}
 									item.image = image;
+									item.onGround = true;
 								} else if (x == 1){
 									var item = myPermanentItems.EnemyFiresBulletsNonLethal;
 									console.log("Non Lethal");
-									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
 									var image = new Image();
@@ -1098,14 +1098,16 @@ app.main = {
 										image.src = app.IMAGES['mushroom'];
 									} else if (r > 50 && r <= 75){
 										image.src = app.IMAGES['flower1'];
+									} else if (r > 75 && r <= 100){
+										image.src = app.IMAGES['plant'];
 									} else {
 										image.src = app.IMAGES['flower2'];
 									}
 									item.image = image;
+									item.onGround = true;
 								} else if (x == 2){
 									var item = myPermanentItems.EnemyFiresBulletsLethal;
 									console.log("Lethal");
-									item.onGround = true;
 									item.x = e.x;
 									item.y = e.y;
 									var image = new Image();
@@ -1116,10 +1118,13 @@ app.main = {
 										image.src = app.IMAGES['mushroom'];
 									} else if (r > 50 && r <= 75){
 										image.src = app.IMAGES['flower1'];
+									} else if (r > 75 && r <= 100){
+										image.src = app.IMAGES['plant'];
 									} else {
 										image.src = app.IMAGES['flower2'];
 									}
 									item.image = image;
+									item.onGround = true;
 								} else if (x == 3){
 
 								}
@@ -1194,7 +1199,7 @@ app.main = {
 		} else if (r > 50 && r <= 75){
 			image.src = app.IMAGES['flower1'];
 		} else if (r > 75 && r <= 100){
-			image.src = app.IMAGES['flower3'];
+			image.src = app.IMAGES['plant'];
 		} else {
 			image.src = app.IMAGES['flower2'];
 		}
@@ -1218,33 +1223,30 @@ app.main = {
 				var item = myPermanentItems.OnFire;
 				if(item.onGround == true){
 					ctx.save();
-					ctx.fillStyle = "blue";
-					ctx.beginPath();
-					ctx.arc(item.x, item.y, item.radius, 0, 2* Math.PI, false);
-					ctx.closePath();
-					ctx.fill();
+					ctx.save();
+					ctx.drawImage(item.image,		 					
+						item.x - item.radius/2, item.y - item.radius/2, item.radius, item.radius);	
+					ctx.restore();
 					ctx.restore();
 				}
 			} else if (i == 1) {
 				var item = myPermanentItems.EnemyFiresBulletsNonLethal;
 				if(item.onGround == true){
 					ctx.save();
-					ctx.fillStyle = "blue";
-					ctx.beginPath();
-					ctx.arc(item.x, item.y, item.radius, 0, 2* Math.PI, false);
-					ctx.closePath();
-					ctx.fill();
+					ctx.save();
+					ctx.drawImage(item.image,		 					
+						item.x - item.radius/2, item.y - item.radius/2, item.radius, item.radius);	
+					ctx.restore();
 					ctx.restore();
 				}
 			} else if (i == 2) {
 				var item = myPermanentItems.EnemyFiresBulletsLethal;
 				if(item.onGround == true){
 					ctx.save();
-					ctx.fillStyle = "blue";
-					ctx.beginPath();
-					ctx.arc(item.x, item.y, item.radius, 0, 2* Math.PI, false);
-					ctx.closePath();
-					ctx.fill();
+					ctx.save();
+					ctx.drawImage(item.image,		 					
+						item.x - item.radius/2, item.y - item.radius/2, item.radius, item.radius);	
+					ctx.restore();
 					ctx.restore();
 				}
 			}
