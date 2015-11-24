@@ -47,30 +47,20 @@ little red riding hood
 
 Power Ups: Shrooms, poop, drink me bottles, eat me pastries
 
+
 _____________POSITIVE_________________
 Health Up //11/10/2015
-Range Up
-Bigger Bullets 
-Pill that makes enemies smaller or you enemies
-4 way shot - temporary 
 Game changes to snake for 30 seconds, get extra lives by playing snake
-you are on fire and deal damage to enemies//11/10/2015
 player gets smaller but faster
 Faster Fire Rate
-pill that slows everything but you down
 
 _____________NEGATIVE_________________
-Health Down//11/10/2015
+Health Down
 random movement if you are not moving yourself, no inputed movement = random movement
-Range Down
-Smaller Bullets
-Larger Enemies
 Reverse controls
-enemies spit bullets //11/10/2015
 enemies are on fire and do more damage
 Give enemies fake doubles ..transparent
 mirror enemies positions based on players location
-power makes a player shoot in random direction
 Slower Fire Rate
 Player has additional movement while moving
 
@@ -81,12 +71,10 @@ Light theme pill
 Screen Switching from light to dark
 Negative pill Manipulates screen to negative  //11/10/2015
 enemies are on fire
-enemies shoot but does nothing. //11/10/2015
-Pill that slows everything down
 
-Conner - Bigger Bullets, Negative Pill
+Conner - Negative Pill, Smaller Bullets, Larger Enemies, Pill that makes enemies smaller or you enemies, Increase size of everything, 
 
-Alex - Pill That slows everything down, Pill that slows everything but you down.
+Alex - Temporary Items Timer, 4 way shot - temporary, power makes a player shoot in random direction
 
 Joe - art assets 4 dayz
 
