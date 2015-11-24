@@ -1184,6 +1184,8 @@ app.main = {
 			image.src = app.IMAGES['mushroom'];
 		} else if (r > 50 && r <= 75){
 			image.src = app.IMAGES['flower1'];
+		} else if (r > 75 && r <= 100){
+			image.src = app.IMAGES['flower3'];
 		} else {
 			image.src = app.IMAGES['flower2'];
 		}
