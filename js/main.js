@@ -264,6 +264,7 @@ app.main = {
 			//draw hud
 			this.drawHUD(this.ctx);
 			
+			this.checkTemporary();
 			this.checkEnemiesDead();
 			
 			// https://developer.mozilla.org/en-US/docs/Web/API/ImageData
@@ -1252,6 +1253,16 @@ app.main = {
 			}
 		}
 		
+	},
+	
+	checkTemporary: function(){
+		for(var i = 0; i < myTemporaryItems.length; i++){
+			if(myTemporaryItems[i].beingUsed != true) continue;
+			var n = timerCall();
+			if((n - myTemporaryItems[i].timeActive) > 15000){
+				myTemporaryItems[i].doEffect(this.PLAYER);
+			}
+		}
 	},
 	
 	//check if all enemies have been killed

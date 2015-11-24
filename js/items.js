@@ -1,5 +1,12 @@
 //this is for items 
 "use strict";
+
+function timerCall(){
+	var d = new Date();
+	var n = d.getTime();
+	return n;
+}
+
 //Permanent Items
 var myPermanentItems = {
 	
@@ -62,10 +69,21 @@ var RangeUp = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		player.maxDistance += 20;
-		this.active = false;
-		console.log("Range Up");
+		if(this.beingUsed == false){
+			this.timeActive = timerCall();
+			player.maxDistance += 20;
+			this.beingUsed = true;
+			this.active = false;
+			console.log("Range Up");
+		}else{
+			player.maxDistance -= 20;
+			this.beingUsed = false;
+			this.timeActive = 0;
+		}
+		
 	}
 };
 
@@ -76,10 +94,20 @@ var BulletSizeUp = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		app.main.bulletSize += 1;
-		this.active = false;
-		console.log("Bullet Up");
+		if(this.beingUsed == false){
+			this.timeActive = timerCall();
+			app.main.bulletSize += 1;
+			this.beingUsed = true;
+			this.active = false;
+			console.log("Bullet Up");
+		}else{
+			app.main.bulletSize -= 1;
+			this.beingUsed = false;
+			this.timeActive = 0;
+		}
 	}
 };
 
@@ -91,13 +119,26 @@ var SlowEnemy = {
 	slowEnemy: true,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(){
-		for(var i = 0; i < app.main.enemies.length; i++){
-			var e = app.main.enemies[i];
-			e.speed /= 2;
+		if(this.beingUsed == false){
+			this.timeActive = timerCall();
+			for(var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.speed /= 2;
+			}
+			this.beingUsed = true;
+			this.active = false;
+			console.log("Slow Enemy");
+		}else{
+			for(var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.speed *= 2;
+			}
+			this.beingUsed = false;
+			this.timeActive = 0;
 		}
-		this.active = false;
-		console.log("Slow Enemy");
 	}
 };
 //-----------Negative-----------
@@ -108,10 +149,20 @@ var RangeDown = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		player.maxDistance -= 20;
-		this.active = false;
-		console.log("Range Down");
+		if(this.beingUsed == false){
+			this.timeActive = timerCall();
+			player.maxDistance -= 20;
+			this.beingUsed = true;
+			this.active = false;
+			console.log("Range Down");
+		}else{
+			player.maxDistance += 20;
+			this.beingUsed = false;
+			this.timeActive = 0;
+		}
 	}
 };
 
@@ -123,14 +174,28 @@ var SlowAll = {
 	slowAll: true,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		for(var i = 0; i < app.main.enemies.length; i++){
-			var e = app.main.enemies[i];
-			e.speed /= 2;
+		if(this.beingUsed == false){
+			this.timeActive = timerCall();
+			for(var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.speed /= 2;
+			}
+			player.speed /= 2;
+			this.beingUsed = true;
+			this.active = false;
+			console.log("Speed");
+		}else{	
+			for(var i = 0; i < app.main.enemies.length; i++){
+				var e = app.main.enemies[i];
+				e.speed *= 2;
+			}
+			player.speed *= 2;
+			this.beingUsed = false;
+			this.timeActive = 0;
 		}
-		player.speed /= 2;
-		this.active = false;
-		console.log("Speed");
 	}
 };
 
@@ -141,10 +206,20 @@ var BulletSizeDown = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		app.main.bulletSize -= 1;
-		console.log("Bullet Down");
-		this.active = false;
+		if(this.beingUsed == false){
+			this.timeActive = timerCall();
+			app.main.bulletSize -= 1;
+			console.log("Bullet Down");
+			this.beingUsed = true;
+			this.active = false;
+		}else{
+			app.main.bulletSize += 1;
+			this.beingUsed = false;
+			this.timeActive = 0;
+		}
 	}
 };
 
@@ -156,10 +231,20 @@ var NegativeColor = {
 	onGround: false,
 	active: false,
 	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
 	doEffect: function(player){
-		app.main.invert = !app.main.invert;
-		console.log("Negative");
-		this.active = false;
+		if(this.beingUsed == false){
+			this.timeActive = timerCall();
+			app.main.invert = !app.main.invert;
+			console.log("Negative");
+			this.beingUsed = true;
+			this.active = false;
+		}else{
+			app.main.invert = app.main.invert;
+			this.beingUsed = false;
+			this.timeActive = 0;
+		}
 	}
 };
 
