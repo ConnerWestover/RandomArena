@@ -265,26 +265,14 @@ var EnemySizeUp = {
 	onGround: false,
 	active: false,
 	image: undefined,
-	beingUsed: false,
-	timeActive: 0,
 	doEffect: function(player){
-		if(this.beingUsed == false){
-			app.main.ENEMY_RADIUS+=4;
-			for (var i = 0; i < app.main.enemies.length; i++){
-				var e = app.main.enemies[i];
-				e.radius = app.main.ENEMY_RADIUS;
-			}
-			this.active = false;
-			console.log("Enemy Size Up");
-		}else{
-			app.main.ENEMY_RADIUS -= 4;
-			for (var i = 0; i < app.main.enemies.length; i++){
-				var e = app.main.enemies[i];
-				e.radius = app.main.ENEMY_RADIUS;
-			}
-			this.beingUsed = false;
-			this.timeActive = 0;
+		app.main.ENEMY_RADIUS+=4;
+		for (var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.radius = app.main.ENEMY_RADIUS;
 		}
+		this.active = false;
+		console.log("Enemy Size Up");
 	}
 };
 
@@ -297,26 +285,14 @@ var EnemySizeDown = {
 	onGround: false,
 	active: false,
 	image: undefined,
-	beingUsed: false,
-	timeActive: 0,
 	doEffect: function(player){
-		if(this.beingUsed == false){
-			app.main.ENEMY_RADIUS-=4;
-			for (var i = 0; i < app.main.enemies.length; i++){
-				var e = app.main.enemies[i];
-				e.radius = app.main.ENEMY_RADIUS;
-			}
-			this.active = false;
-			console.log("Enemy Size Down");
-		}else{
-			app.main.ENEMY_RADIUS += 4;
-			for (var i = 0; i < app.main.enemies.length; i++){
-				var e = app.main.enemies[i];
-				e.radius = app.main.ENEMY_RADIUS;
-			}
-			this.beingUsed = false;
-			this.timeActive = 0;
+		app.main.ENEMY_RADIUS-=4;
+		for (var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.radius = app.main.ENEMY_RADIUS;
 		}
+		this.active = false;
+		console.log("Enemy Size Down");
 	}
 };
 
@@ -329,18 +305,10 @@ var PlayerSizeUp = {
 	onGround: false,
 	active: false,
 	image: undefined,
-	beingUsed: false,
-	timeActive: 0,
 	doEffect: function(player){
-		if(this.beingUsed == false){
-			player.radius +=4;
-			this.active = false;
-			console.log("Player Size Up");
-		}else{
-			player.radius -=4;
-			this.beingUsed = false;
-			this.timeActive = 0;
-		}
+		player.radius +=4;
+		this.active = false;
+		console.log("Player Size Up");
 	}
 };
 
@@ -353,18 +321,10 @@ var PlayerSizeDown = {
 	onGround: false,
 	active: false,
 	image: undefined,
-	beingUsed: false,
-	timeActive: 0,
 	doEffect: function(player){
-		if(this.beingUsed == false){
-			player.radius -= 4;
-			this.active = false;
-			console.log("Player Size Down");
-		}else{
-			player.radius +=4;
-			this.beingUsed = false;
-			this.timeActive = 0;
-		}
+		player.radius -= 4;
+		this.active = false;
+		console.log("Player Size Down");
 	}
 };
 
@@ -377,30 +337,18 @@ var EveryoneSizeUp = {
 	onGround: false,
 	active: false,
 	image: undefined,
-	beingUsed: false,
-	timeActive: 0,
 	doEffect: function(player){
-		if(this.beingUsed == false){
-			app.main.ENEMY_RADIUS+=4;
-			for (var i = 0; i < app.main.enemies.length; i++){
-				var e = app.main.enemies[i];
-				e.radius = app.main.ENEMY_RADIUS;
-			}
-			player.radius +=4;
-			this.active = false;
-			console.log("Everyone Size Up");
-		}else{
-			app.main.ENEMY_RADIUS-=4;
-			for (var i = 0; i < app.main.enemies.length; i++){
-				var e = app.main.enemies[i];
-				e.radius = app.main.ENEMY_RADIUS;
-			}
-			player.radius -=4;
-			this.beingUsed = false;
-			this.timeActive = 0;
+		app.main.ENEMY_RADIUS+=4;
+		for (var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.radius = app.main.ENEMY_RADIUS;
 		}
+		this.active = false;
+		console.log("Everyone Size Up");
 	}
 };
+
+
 
 var EveryoneSizeDown = {
 	x: 0,
@@ -411,29 +359,82 @@ var EveryoneSizeDown = {
 	onGround: false,
 	active: false,
 	image: undefined,
-	beingUsed: false,
-	timeActive: 0,
 	doEffect: function(player){
-		if(this.beingUsed == false){
-			app.main.ENEMY_RADIUS-=4;
-			for (var i = 0; i < app.main.enemies.length; i++){
-				var e = app.main.enemies[i];
-				e.radius = app.main.ENEMY_RADIUS;
-			}
-			player.radius -=4;
-			this.active = false;
-			console.log("Everyone Size Down");
-		}else{
-			app.main.ENEMY_RADIUS+=4;
-			for (var i = 0; i < app.main.enemies.length; i++){
-				var e = app.main.enemies[i];
-				e.radius = app.main.ENEMY_RADIUS;
-			}
-			player.radius +=4;
-			this.beingUsed = false;
-			this.timeActive = 0;
+		app.main.ENEMY_RADIUS-=4;
+		for (var i = 0; i < app.main.enemies.length; i++){
+			var e = app.main.enemies[i];
+			e.radius = app.main.ENEMY_RADIUS;
 		}
+		this.active = false;
+		console.log("Everyone Size Down");
+	}
+};
+
+//Health
+
+var HalfHealth = {
+	x: 0,
+	y: 0,
+	name: "Half Health",
+	description: "you're at half health",
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.PLAYER.health = ((app.main.PLAYER.maxHealth)/2);
+		this.active = false;
+		console.log("player at half health");
+	}
+};
+var FullHealth = {
+	x: 0,
+	y: 0,
+	name: "Full Health",
+	description: "you have full health",
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.PLAYER.health = app.main.PLAYER.maxHealth;
+		this.active = false;
+		console.log("player at full health");
+	}
+};
+
+var HealthUp = {
+	x: 0,
+	y: 0,
+	name: "Health Up",
+	description: "more health",
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.PLAYER.maxHealth ++;
+		app.main.PLAYER.health ++;
+		this.active = false;
+		console.log("Max health increased, player slightly healed");
+	}
+};
+var HealthDown = {
+	x: 0,
+	y: 0,
+	name: "health down",
+	description: "you have less health",
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player){
+		app.main.PLAYER.maxHealth --;
+		app.main.PLAYER.health --;
+		this.active = false;
+		console.log("Max health decreased, player slightly damaged");
 	}
 };
 
 var myTemporaryItems = [OnFire, EnemyFiresBulletsLethal, EnemyFiresBulletsNonLethal, RangeUp, RangeDown, SlowEnemy, SlowAll, NegativeColor, BulletSizeDown, BulletSizeUp,EnemySizeUp,EnemySizeDown,PlayerSizeUp,PlayerSizeDown, EveryoneSizeUp, EveryoneSizeDown];
+
