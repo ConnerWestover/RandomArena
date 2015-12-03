@@ -37,6 +37,10 @@ app.main = {
 	bulletSize: 5,
 	ENEMY_RADIUS: 18,
 	
+	itemText: "",
+	descriptionText: "",
+	timePutOnScreen: 0,
+	
 	itemsOnGround: [],
 	invert: false,
 	
@@ -47,6 +51,8 @@ app.main = {
 	
 	eBullActive: false,
 	eBullLethal: false,
+	
+	playerOnFire: false,
 	
 	
 	PLAYER: {
@@ -113,12 +119,10 @@ app.main = {
 				this.reset();
 				//Reset Items
 				this.itemsOnGround = [];
-				myPermanentItems.OnFire.active = false;
-				myPermanentItems.EnemyFiresBulletsLethal.active = false;
-				myPermanentItems.EnemyFiresBulletsNonLethal.active = false;
 				
 				this.eBullLethal = false;
 				this.eBullActive = false;
+				this.playerOnFire = false;
 				
 				this.bulletSize = 5;
 				this.ENEMY_RADIUS = 32;
@@ -205,15 +209,6 @@ app.main = {
 		}
 	 	// 3) HOW MUCH TIME HAS GONE BY?
 	 	var dt = this.calculateDeltaTime();
-	 	 
-	 	// 4) UPDATE
-		this.moveEnemy(dt);
-		this.checkForCollisions();
-		
-		//powers check
-		if(this.eBullActive == true){
-			this.enemyShoot();
-		}
 		
 		// i) draw background	
 		if (this.gameState == this.GAME_STATE.DEFAULT){
@@ -224,6 +219,13 @@ app.main = {
 
 		//GamePlay Drawing Happens
 		if (this.gameState == this.GAME_STATE.DEFAULT || this.gameState == this.GAME_STATE.ROUND_OVER){
+			this.moveEnemy(dt);
+			this.checkForCollisions();
+			
+			//powers check
+			if(this.eBullActive == true){
+				this.enemyShoot();
+			}
 			//update everyone
 			if(myKeys.keydown[myKeys.KEYBOARD.KEY_W]){
 				this.PLAYER.moveY(-dt);
@@ -251,7 +253,6 @@ app.main = {
 			} 
 			this.PLAYER.update(dt);
 		
-			this.checkItem();
 			if(this.gameState != this.GAME_STATE.ROUND_OVER){
 				this.drawOnGroundItems(this.ctx);
 			}
@@ -262,6 +263,7 @@ app.main = {
 			}
 			this.PLAYER.draw(this.ctx);
 			//draw hud
+			this.drawItemText(this.ctx);
 			this.drawHUD(this.ctx);
 			
 			this.checkTemporary();
@@ -384,9 +386,11 @@ app.main = {
 			ctx.lineWidth = 4;
 			this.fillText(ctx, "Back", 60, 30, "30pt Permanent Marker", "black");
 			this.fillText(ctx, "About", this.WIDTH/2, this.HEIGHT/8, "60pt Permanent Marker", "black");
-			this.fillText(ctx, "Random Arena was created by:", this.WIDTH/2, this.HEIGHT*2/5, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Down The Rabbit Hole was created by:", this.WIDTH/2, this.HEIGHT*2/5, "30pt Permanent Marker", "black");
 			this.fillText(ctx, "Alexander Huffman", this.WIDTH/2, this.HEIGHT*2/5+40, "30pt Permanent Marker", "black");
 			this.fillText(ctx, "Conner Westover", this.WIDTH/2, this.HEIGHT*2/5+80, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Joe Garcia", this.WIDTH/2, this.HEIGHT*2/5+120, "30pt Permanent Marker", "black");
+			this.fillText(ctx, "Andrew Knowland", this.WIDTH/2, this.HEIGHT*2/5+160, "30pt Permanent Marker", "black");
 			ctx.strokeRect(0,0,130,60);
 			ctx.restore();
 		}
@@ -771,13 +775,13 @@ app.main = {
 					if(this.xSpeed >= 0){
 						this.fireDirection = 2;
 						ctx.drawImage(this.image,				
-						0 + this.spriteNumber * 32 + this.column * 96,64 + this.row * 128,32,32,		 					
+						1 + this.spriteNumber * 32 + this.column * 96,65 + this.row * 128,31,31,		 					
 						this.x- halfW, this.y- halfH, halfW*2, halfH*2
 						);
 					} else {
 						this.fireDirection = 3;
 						ctx.drawImage(this.image,				
-						0 + this.spriteNumber * 32 + this.column * 96,32 + this.row * 128,32,32,		 					
+						1 + this.spriteNumber * 32 + this.column * 96,33 + this.row * 128,31,31,		 					
 						this.x- halfW, this.y- halfH, halfW*2, halfH*2
 						);
 					}
@@ -785,13 +789,13 @@ app.main = {
 					if(this.ySpeed >= 0){
 						this.fireDirection = 1;
 						ctx.drawImage(this.image,				
-						0 + this.spriteNumber * 32 + this.column * 96,0 + this.row * 128,32,32,		 					
+						1 + this.spriteNumber * 32 + this.column * 96,1 + this.row * 128,31,31,		 					
 						this.x- halfW, this.y- halfH, halfW*2, halfH*2
 						);	
 					} else {
 						this.fireDirection = 0;
 						ctx.drawImage(this.image,					 					
-						0 + this.spriteNumber * 32 + this.column * 96,96 + this.row * 128,32,32,		 					
+						1 + this.spriteNumber * 32 + this.column * 96,97 + this.row * 128,31,31,		 					
 						this.x- halfW, this.y- halfH, halfW*2, halfH*2
 						);
 					}
@@ -1020,8 +1024,11 @@ app.main = {
 				Math.abs(this.PLAYER.x - this.enemies[j].x) < this.PLAYER.radius + this.enemies[j].radius &&
 				Math.abs(this.PLAYER.y - this.enemies[j].y) < this.PLAYER.radius + this.enemies[j].radius){
 					this.PLAYER.health -= this.enemies[j].attackPower; //decrement					health
-					if (myPermanentItems.OnFire.active == true){
-						myPermanentItems.OnFire.doEffect(this.PLAYER, this.enemies[j]);
+					if (this.playerOnFire.active == true){
+						this.enemies[j].health -= player.attackPower * 2;
+						if (this.enemies[j].health <= 0){
+							this.enemies[j].alive = false;
+						}
 					}
 					this.sound.playPlayerHurtEffect();
 					if(this.PLAYER.health <= 0){ //make sure health can't go negative and sets round to over
@@ -1062,80 +1069,9 @@ app.main = {
 					if(e.health <= 0){
 						e.alive = false;
 						this.totalScore = this.totalScore + 1;
-						if(getRandom(0,100) > 70){
-						//Drops Permanent
-							if(getRandom(0,100) > 50){
-								var x = Math.floor(getRandom(0, myPermanentItems.count));
-								if(x == 0){
-									var item = myPermanentItems.OnFire;
-									console.log("On Fire");
-									item.x = e.x;
-									item.y = e.y;
-									var image = new Image();
-									var r = getRandom(0,100);
-									if (r > 0 && r <=25){
-										image.src = app.IMAGES['pill'];
-									} else if (r > 25 && r <= 50){
-										image.src = app.IMAGES['mushroom'];
-									} else if (r > 50 && r <= 75){
-										image.src = app.IMAGES['flower1'];
-									} else if (r > 75 && r <= 100){
-										image.src = app.IMAGES['plant'];
-									} else {
-										image.src = app.IMAGES['flower2'];
-									}
-									item.image = image;
-									item.onGround = true;
-								} else if (x == 1){
-									var item = myPermanentItems.EnemyFiresBulletsNonLethal;
-									console.log("Non Lethal");
-									item.x = e.x;
-									item.y = e.y;
-									var image = new Image();
-									var r = getRandom(0,100);
-									if (r > 0 && r <=25){
-										image.src = app.IMAGES['pill'];
-									} else if (r > 25 && r <= 50){
-										image.src = app.IMAGES['mushroom'];
-									} else if (r > 50 && r <= 75){
-										image.src = app.IMAGES['flower1'];
-									} else if (r > 75 && r <= 100){
-										image.src = app.IMAGES['plant'];
-									} else {
-										image.src = app.IMAGES['flower2'];
-									}
-									item.image = image;
-									item.onGround = true;
-								} else if (x == 2){
-									var item = myPermanentItems.EnemyFiresBulletsLethal;
-									console.log("Lethal");
-									item.x = e.x;
-									item.y = e.y;
-									var image = new Image();
-									var r = getRandom(0,100);
-									if (r > 0 && r <=25){
-										image.src = app.IMAGES['pill'];
-									} else if (r > 25 && r <= 50){
-										image.src = app.IMAGES['mushroom'];
-									} else if (r > 50 && r <= 75){
-										image.src = app.IMAGES['flower1'];
-									} else if (r > 75 && r <= 100){
-										image.src = app.IMAGES['plant'];
-									} else {
-										image.src = app.IMAGES['flower2'];
-									}
-									item.image = image;
-									item.onGround = true;
-								} else if (x == 3){
-
-								}
-							}
-						} else {
-						//Drops Temporary
-							if(getRandom(0,100) > 50){
-								var x = Math.floor(getRandom(0, myTemporaryItems.length));
-								this.makeActiveItem(x, e.x,e.y);								
-							}
+						if(getRandom(0,100) > 40){
+							var x = Math.floor(getRandom(0, myTemporaryItems.length));
+							this.makeActiveItem(x, e.x,e.y);								
 						}
 					}
 				}
@@ -1148,38 +1084,13 @@ app.main = {
 					if(this.itemsOnGround[i].active != true && this.itemsOnGround[i].onGround == true){
 						this.itemsOnGround[i].onGround = false;
 						this.itemsOnGround[i].doEffect(this.PLAYER);
+						
+						this.itemText = this.itemsOnGround[i].name;
+						this.descriptionText = this.itemsOnGround[i].description;
+						var d = new Date();
+						this.timePutOnScreen = d.getTime();
 					} else {
 						this.itemsOnGround.splice(i, 1);
-					}
-				}
-			}
-			for (var i = 0; i < myPermanentItems.count; i++){
-				if (i == 0){
-					var item = myPermanentItems.OnFire;
-					if (Math.abs(this.PLAYER.x - item.x) < this.PLAYER.radius + item.radius &&
-						Math.abs(this.PLAYER.y - item.y) < this.PLAYER.radius + item.radius){
-						if(item.onGround == true){
-							item.onGround = false;
-							item.active = true;
-						}
-					}
-				} else if (i == 1){
-					var item = myPermanentItems.EnemyFiresBulletsNonLethal;
-					if (Math.abs(this.PLAYER.x - item.x) < this.PLAYER.radius + item.radius &&
-						Math.abs(this.PLAYER.y - item.y) < this.PLAYER.radius + item.radius){
-						if(item.onGround == true){
-							item.onGround = false;
-							item.active = true;
-						}
-					}
-				} else if (i == 2){
-					var item = myPermanentItems.EnemyFiresBulletsLethal;
-					if (Math.abs(this.PLAYER.x - item.x) < this.PLAYER.radius + item.radius &&
-						Math.abs(this.PLAYER.y - item.y) < this.PLAYER.radius + item.radius){
-						if(item.onGround == true){
-							item.onGround = false;
-							item.active = true;
-						}
 					}
 				}
 			}
@@ -1216,40 +1127,6 @@ app.main = {
 				ctx.drawImage(item.image,		 					
 					item.x - item.radius/2, item.y - item.radius/2, item.radius, item.radius);	
 				ctx.restore();
-			}
-		}
-		
-		for (var i = 0; i < myPermanentItems.count; i++){
-			if (i == 0){
-				var item = myPermanentItems.OnFire;
-				if(item.onGround == true){
-					ctx.save();
-					ctx.save();
-					ctx.drawImage(item.image,		 					
-						item.x - item.radius/2, item.y - item.radius/2, item.radius, item.radius);	
-					ctx.restore();
-					ctx.restore();
-				}
-			} else if (i == 1) {
-				var item = myPermanentItems.EnemyFiresBulletsNonLethal;
-				if(item.onGround == true){
-					ctx.save();
-					ctx.save();
-					ctx.drawImage(item.image,		 					
-						item.x - item.radius/2, item.y - item.radius/2, item.radius, item.radius);	
-					ctx.restore();
-					ctx.restore();
-				}
-			} else if (i == 2) {
-				var item = myPermanentItems.EnemyFiresBulletsLethal;
-				if(item.onGround == true){
-					ctx.save();
-					ctx.save();
-					ctx.drawImage(item.image,		 					
-						item.x - item.radius/2, item.y - item.radius/2, item.radius, item.radius);	
-					ctx.restore();
-					ctx.restore();
-				}
 			}
 		}
 		
@@ -1329,12 +1206,17 @@ app.main = {
 		ctx.putImageData(imageData, 0, 0);
 	},
 	
-	checkItem: function(){
-		if ( myPermanentItems.EnemyFiresBulletsNonLethal.active){
-			myPermanentItems.EnemyFiresBulletsNonLethal.doEffect();
-		} 
-		if (myPermanentItems.EnemyFiresBulletsLethal.active){
-			myPermanentItems.EnemyFiresBulletsLethal.doEffect();
+	drawItemText: function(ctx){
+		var d = new Date();
+		if (d.getTime() - this.timePutOnScreen < 2500){
+			ctx.save();
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.fillStyle = "rgba(20,20,20,.5)";
+			ctx.fillRect(this.WIDTH/2 - 300, this.HEIGHT/4 - 40, 600, 100);
+			this.fillText(this.ctx,this.itemText, this.WIDTH/2, this.HEIGHT/4, "40pt Permanent Marker", "black");
+			this.fillText(this.ctx,this.descriptionText, this.WIDTH/2, this.HEIGHT/4 + 40, "20pt Permanent Marker", "black");
+			ctx.restore();
 		}
 	}
 	

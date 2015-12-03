@@ -7,64 +7,26 @@ function timerCall(){
 	return n;
 }
 
-//Permanent Items
-var myPermanentItems = {
-	
-	count:3,
-
-	//-----------Positive-----------
-	OnFire: {
-		x: 0,
-		y: 0,
-		radius: 20,
-		onGround: false,
-		active: false,
-		image: undefined,
-		doEffect: function(player, enemy){
-			enemy.health -= player.attackPower * 2;
-			if (enemy.health <= 0){
-				enemy.alive = false;
-			}
-		}
-	},
-	//-----------Negative-----------
-	EnemyFiresBulletsLethal: {
-		x: 0,
-		y: 0,
-		radius: 20,
-		onGround: false,
-		active: false,
-		image: undefined,
-		doEffect: function(){
-			myPermanentItems.EnemyFiresBulletsNonLethal.active = false;
-			myPermanentItems.EnemyFiresBulletsLethal.active = false;
-			app.main.eBullActive = true;
-			app.main.eBullLethal = true;
-		}
-	},
-	EnemyFiresBulletsNonLethal: {
-		x: 0,
-		y: 0,
-		radius: 20,
-		onGround: false,
-		active: false,
-		image: undefined,
-		doEffect: function(){
-			app.main.eBullActive = true;
-			app.main.eBullLethal = false;
-			myPermanentItems.EnemyFiresBulletsNonLethal.active = false;
-			myPermanentItems.EnemyFiresBulletsLethal.active = false;
-		}
-	}
-	//-----------Neutral------------
-
-};
-//temporaryItems
-
 //-----------Positive-----------
+var OnFire = {
+	x: 0,
+	y: 0,
+	name: "On Fire",
+	description: "YOU'RE ON FIRE",
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	doEffect: function(player, enemy){
+		app.main.playerOnFire = !app.main.playerOnFire;
+	}
+};
+
 var RangeUp = {
 	x: 0,
 	y: 0,
+	name: "Range Up",
+	description: "shoot farther",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -90,6 +52,8 @@ var RangeUp = {
 var BulletSizeUp = {
 	x: 0,
 	y: 0,
+	name: "Bullet Up",
+	description: "larger bullets",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -114,6 +78,8 @@ var BulletSizeUp = {
 var SlowEnemy = {
 	x: 0,
 	y: 0,
+	name: "Slow Enemy",
+	description: "enemies are hindered",
 	radius: 20,
 	onGround: false,
 	slowEnemy: true,
@@ -142,9 +108,28 @@ var SlowEnemy = {
 	}
 };
 //-----------Negative-----------
+var EnemyFiresBulletsLethal = {
+	x: 0,
+	y: 0,
+	name: "Enemies Spit Bullets",
+	description: "LOOKOUT",
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
+	doEffect: function(player){
+		app.main.eBullActive = true;
+		app.main.eBullLethal = true;
+	}
+};
+
 var RangeDown = {
 	x: 0,
 	y: 0,
+	name: "Range Down",
+	description: "shoot not so far",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -169,6 +154,8 @@ var RangeDown = {
 var SlowAll = {
 	x: 0,
 	y: 0,
+	name: "Slow Down",
+	description: "everything gets slower",
 	radius: 20,
 	onGround: false,
 	slowAll: true,
@@ -202,6 +189,8 @@ var SlowAll = {
 var BulletSizeDown = {
 	x: 0,
 	y: 0,
+	name: "Bullet Down",
+	description: "smaller bullets",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -224,9 +213,28 @@ var BulletSizeDown = {
 };
 
 //-----------Neutral------------
+var EnemyFiresBulletsNonLethal = {
+	x: 0,
+	y: 0,
+	name: "Enemies Spit Bullets",
+	description: "...nerf bullets",
+	radius: 20,
+	onGround: false,
+	active: false,
+	image: undefined,
+	beingUsed: false,
+	timeActive: 0,
+	doEffect: function(player){
+		app.main.eBullActive = true;
+		app.main.eBullLethal = false;
+	}
+};
+
 var NegativeColor = {
 	x: 0,
 	y: 0,
+	name: "Negative",
+	description: "what happened to the colors?",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -251,6 +259,8 @@ var NegativeColor = {
 var EnemySizeUp = {
 	x: 0,
 	y: 0,
+	name: "Enemy Size Up",
+	description: "David vs Goliaths",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -281,6 +291,8 @@ var EnemySizeUp = {
 var EnemySizeDown = {
 	x: 0,
 	y: 0,
+	name: "Enemy Size Down",
+	description: "Goliath vs Davids",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -311,6 +323,8 @@ var EnemySizeDown = {
 var PlayerSizeUp = {
 	x: 0,
 	y: 0,
+	name: "Player Size Up",
+	description: "stop eating so much",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -333,6 +347,8 @@ var PlayerSizeUp = {
 var PlayerSizeDown = {
 	x: 0,
 	y: 0,
+	name: "Player Size Down",
+	description: "you should eat more",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -355,6 +371,8 @@ var PlayerSizeDown = {
 var EveryoneSizeUp = {
 	x: 0,
 	y: 0,
+	name: "SIZE UP",
+	description: "is the room shrinking?",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -387,6 +405,8 @@ var EveryoneSizeUp = {
 var EveryoneSizeDown = {
 	x: 0,
 	y: 0,
+	name: "SIZE DOWN",
+	description: "everything feels... bigger",
 	radius: 20,
 	onGround: false,
 	active: false,
@@ -416,4 +436,4 @@ var EveryoneSizeDown = {
 	}
 };
 
-var myTemporaryItems = [RangeUp, RangeDown, SlowEnemy, SlowAll, NegativeColor, BulletSizeDown, BulletSizeUp,EnemySizeUp,EnemySizeDown,PlayerSizeUp,PlayerSizeDown, EveryoneSizeUp, EveryoneSizeDown];
+var myTemporaryItems = [OnFire, EnemyFiresBulletsLethal, EnemyFiresBulletsNonLethal, RangeUp, RangeDown, SlowEnemy, SlowAll, NegativeColor, BulletSizeDown, BulletSizeUp,EnemySizeUp,EnemySizeDown,PlayerSizeUp,PlayerSizeDown, EveryoneSizeUp, EveryoneSizeDown];
